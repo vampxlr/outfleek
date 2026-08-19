@@ -551,13 +551,14 @@ const SLIDES = [
       </svg>
       <div class="reveal r3">
         <p><b>4 independent paths (basis set):</b></p>
+        <p style="font-size:.82em;opacity:.75;margin:-4px 0 8px">Decisions: <code>subtotal−discount ≥ threshold</code> → <code>override != null</code> → <code>area === "dhaka"</code></p>
         <ul>
-          <li><span style="color:#34d399">●</span> subtotal ≥ 2000 → fee = 0</li>
-          <li><span style="color:#f472b6">●</span> subtotal &lt; 2000, area = Dhaka → fee = 80</li>
-          <li><span style="color:#fbbf24">●</span> subtotal &lt; 2000, area ≠ Dhaka → fee = 130</li>
-          <li><span style="color:#f87171">●</span> boundary re-check at exactly 2000 → fee = 0</li>
+          <li><span style="color:#34d399">●</span> P1 — subtotal − discount ≥ 2000 → fee = 0</li>
+          <li><span style="color:#f472b6">●</span> P2 — below threshold, override set → fee = override</li>
+          <li><span style="color:#fbbf24">●</span> P3 — below threshold, no override, area = Dhaka → fee = 80</li>
+          <li><span style="color:#f87171">●</span> P4 — below threshold, no override, area = outside → fee = 130</li>
         </ul>
-        <p style="margin-top:10px;">Cyclomatic complexity = 4 → exactly 4 independent paths required for full basis path coverage. All 4 executed by the 81 unit tests.</p>
+        <p style="margin-top:10px;">Cyclomatic complexity = 4 → exactly 4 independent paths form the basis set. All 4 are executed by the unit tests; the ৳1999 / ৳2000 / ৳2001 boundary values additionally probe the P1 decision edge.</p>
       </div>
     </div>
   </div>
