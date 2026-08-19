@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /project
+Disallow: /project/
+Disallow: /admin

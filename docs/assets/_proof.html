@@ -1,0 +1,71 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glass system proof</title>
+<link rel="stylesheet" href="glass.css">
+<style>
+  .wrap{max-width:1120px;margin:0 auto;padding:56px 28px 90px}
+  .cols{display:grid;grid-template-columns:260px 1fr;gap:26px;align-items:start}
+  .side{position:sticky;top:26px;padding:20px}
+  .side a{display:block;padding:9px 13px;border-radius:10px;color:var(--ink-2);font-size:.9rem;border:0;margin-bottom:2px}
+  .side a.on{background:var(--accent-soft);color:#fff;box-shadow:var(--edge);border:1px solid rgba(124,156,255,.28)}
+  .card{padding:32px 34px;margin-bottom:24px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .stat{padding:22px;text-align:center}
+  .stat .n{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;
+    background:linear-gradient(180deg,#fff,#9DB6FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat .l{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
+</style></head><body>
+<div class="bg-field"><div class="orb a"></div><div class="orb b"></div><div class="orb c"></div></div>
+<div class="bg-grain"></div>
+<div class="wrap">
+  <div class="cols">
+    <nav class="side glass-neutral">
+      <div class="eyebrow" style="margin-bottom:12px">Contents</div>
+      <a class="on" href="#">1 · Introduction</a>
+      <a href="#">2 · Test Environment</a>
+      <a href="#">3 · Methodology</a>
+      <a href="#">4 · White Box Testing</a>
+      <a href="#">5 · Defects</a>
+    </nav>
+    <main>
+      <section class="card glass-raised">
+        <div class="eyebrow">Software Testing &amp; QA Lab</div>
+        <h1>Testing and Validation Report</h1>
+        <p class="lede">A restrained glass system: deep neutral base, discrete blurred orbs, a crisp 1&nbsp;px edge and an inset top highlight on every surface. One accent, one typeface.</p>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:6px">
+          <span class="pill">Next.js 15</span><span class="pill">Convex</span>
+          <span class="pill">Vitest</span><span class="pill">81 tests</span>
+        </div>
+      </section>
+
+      <div class="grid3" style="margin-bottom:24px">
+        <div class="stat glass"><div class="n">98.63%</div><div class="l">Statements</div></div>
+        <div class="stat glass"><div class="n">98.24%</div><div class="l">Branches</div></div>
+        <div class="stat glass"><div class="n">81</div><div class="l">Unit tests</div></div>
+      </div>
+
+      <section class="card glass">
+        <h2>Test case block</h2>
+        <p>Body copy sits at 66&nbsp;% opacity so headings lead. Inline <code>calcDeliveryFee()</code> reads clearly against the glass.</p>
+        <div style="display:flex;gap:8px;margin:0 0 18px"><span class="badge badge-pass">Pass</span><span class="badge badge-info">Security</span><span class="badge badge-warn">Observation</span></div>
+        <pre><span class="tk-com">// recessed well — cut into the glass, never overflowing</span>
+<span class="tk-key">export function</span> <span class="tk-fn">calcDeliveryFee</span>(opts) {
+  <span class="tk-key">if</span> (subtotal - discount &gt;= freeThreshold) <span class="tk-key">return</span> <span class="tk-num">0</span>;
+  <span class="tk-key">if</span> (override != <span class="tk-key">null</span>) <span class="tk-key">return</span> override;
+  <span class="tk-key">return</span> area === <span class="tk-str">"dhaka"</span> ? feeDhaka : feeOutside;
+}</pre>
+        <div class="tbl-wrap" style="margin-top:20px">
+          <table>
+            <thead><tr><th>Path</th><th>Condition</th><th>Input</th><th>Expected</th></tr></thead>
+            <tbody>
+              <tr><td>P1</td><td>subtotal − discount ≥ threshold</td><td>2000, 0</td><td>0</td></tr>
+              <tr><td>P2</td><td>override != null</td><td>1000, override 50</td><td>50</td></tr>
+              <tr><td>P3</td><td>area === "dhaka"</td><td>1000, dhaka</td><td>80</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+</body></html>

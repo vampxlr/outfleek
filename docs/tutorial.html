@@ -1,66 +1,256 @@
 <title>Outfleek Tutorial</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-  :root {
-    --bg-0: #0b0a1a;
-    --bg-1: #120f28;
-    --ink: #eae7fb;
-    --ink-dim: #b7b2d9;
-    --ink-faint: #837da8;
-    --accent: #a78bfa;
-    --accent-2: #6ee7d4;
-    --accent-3: #f0a8d0;
-    --glass-bg: rgba(255, 255, 255, 0.055);
-    --glass-bg-strong: rgba(255, 255, 255, 0.09);
-    --glass-border: rgba(255, 255, 255, 0.14);
-    --code-bg: rgba(8, 7, 20, 0.55);
-    --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
-    --serif: "Fraunces", Georgia, "Times New Roman", serif;
-    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  }
+/* ============================================================
+   Outfleek — Glass Design System
+   A restrained, standards-correct glassmorphism kit.
+   Used by: LAB-REPORT.html · tutorial.html · presentation/index.html
+   ============================================================ */
 
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+:root{
+  /* --- base: deep neutral slate, NOT muddy purple --- */
+  --bg-0:#080B12;
+  --bg-1:#0B0F1A;
 
-  body {
-    margin: 0;
-    background: var(--bg-0);
-    color: var(--ink);
-    font-family: var(--sans);
-    line-height: 1.65;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-  }
+  /* --- one accent family (indigo -> cyan). No rainbow. --- */
+  --accent:#7C9CFF;
+  --accent-2:#4ED8C4;
+  --accent-soft:rgba(124,156,255,.16);
 
-  @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
-  }
+  /* --- semantic --- */
+  --ok:#4ADE80;
+  --warn:#FBBF24;
+  --bad:#F87171;
 
-  /* ---------- ambient background blobs ---------- */
-  .blobs { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-  .blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(90px);
-    opacity: 0.55;
-    will-change: transform;
-  }
-  .blob.b1 { width: 46vw; height: 46vw; top: -10%; left: -8%; background: radial-gradient(circle, #6d4fc7, transparent 70%); animation: float1 26s ease-in-out infinite; }
-  .blob.b2 { width: 40vw; height: 40vw; top: 30%; right: -12%; background: radial-gradient(circle, #2fb8a8, transparent 70%); animation: float2 32s ease-in-out infinite; }
-  .blob.b3 { width: 38vw; height: 38vw; bottom: -14%; left: 20%; background: radial-gradient(circle, #c25fa0, transparent 70%); animation: float3 29s ease-in-out infinite; }
-  @keyframes float1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(6vw, 8vh) scale(1.12); } }
-  @keyframes float2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-7vw, -5vh) scale(0.92); } }
-  @keyframes float3 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(4vw, -7vh) scale(1.08); } }
+  /* --- glass surfaces (3 depth tiers) --- */
+  --glass:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035)),rgba(10,14,24,.30);
+  --glass-raised:linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.05)),rgba(10,14,24,.26);
+  --glass-inset:rgba(4,7,14,.44);
+  --stroke:rgba(255,255,255,.10);
+  --stroke-strong:rgba(255,255,255,.16);
 
-  /* ---------- progress bar ---------- */
-  #progress {
-    position: fixed; top: 0; left: 0; height: 3px; width: 0%;
-    background: linear-gradient(90deg, var(--accent-2), var(--accent), var(--accent-3));
-    z-index: 100; transition: width 0.08s linear;
-    box-shadow: 0 0 12px rgba(167,139,250,0.7);
-  }
+  /* the two shadows that actually sell "glass":
+     an inset top highlight + a deep soft drop shadow */
+  --edge:inset 0 1px 0 rgba(255,255,255,.14);
+  --edge-strong:inset 0 1px 0 rgba(255,255,255,.22);
+  --drop:0 16px 40px rgba(0,0,0,.42);
+  --drop-lg:0 28px 70px rgba(0,0,0,.52);
+
+  /* --- text --- */
+  --ink:#EEF2F9;
+  --ink-2:rgba(238,242,249,.66);
+  --ink-3:rgba(238,242,249,.42);
+
+  --r-sm:10px; --r:16px; --r-lg:22px;
+
+  --sans:"Inter","Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono","SF Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--bg-1);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  line-height:1.65;
+}
+
+/* ---------- BACKDROP ----------
+   Discrete, well-separated, heavily blurred orbs on a deep base.
+   This gives backdrop-filter real structure to refract without
+   washing the foreground out. */
+.bg-field{
+  position:fixed; inset:0; z-index:-2; overflow:hidden;
+  background:
+    radial-gradient(1200px 800px at 15% -10%, #16204A 0%, transparent 60%),
+    radial-gradient(1000px 700px at 100% 0%,  #10303A 0%, transparent 55%),
+    linear-gradient(180deg,var(--bg-0),var(--bg-1) 40%,#070A11 100%);
+}
+.orb{
+  position:absolute; border-radius:50%;
+  filter:blur(110px);
+  opacity:.40;
+  will-change:transform;
+}
+.orb.a{width:46vw;height:46vw;left:-8vw;top:-10vw;   background:#3B5BDB; animation:drift1 34s ease-in-out infinite;}
+.orb.b{width:38vw;height:38vw;right:-6vw;top:8vh;    background:#0E7490; animation:drift2 40s ease-in-out infinite;}
+.orb.c{width:34vw;height:34vw;left:22vw;bottom:-14vw;background:#6D3BDB; opacity:.30; animation:drift3 46s ease-in-out infinite;}
+
+@keyframes drift1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(6vw,4vh,0) scale(1.12)}}
+@keyframes drift2{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-5vw,6vh,0) scale(1.08)}}
+@keyframes drift3{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(4vw,-5vh,0) scale(1.15)}}
+
+/* fine grain — the detail that stops glass looking like plastic */
+.bg-grain{
+  position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.032;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- GLASS SURFACES ---------- */
+.glass{
+  background:var(--glass);
+  -webkit-backdrop-filter:blur(26px) saturate(125%);
+  backdrop-filter:blur(26px) saturate(125%);
+  border:1px solid var(--stroke);
+  border-radius:var(--r-lg);
+  box-shadow:var(--edge),var(--drop);
+}
+.glass-raised{
+  background:var(--glass-raised);
+  -webkit-backdrop-filter:blur(32px) saturate(130%);
+  backdrop-filter:blur(32px) saturate(130%);
+  border:1px solid var(--stroke-strong);
+  border-radius:var(--r-lg);
+  box-shadow:var(--edge-strong),var(--drop-lg);
+}
+/* recessed wells (code blocks, tables) read as cut *into* the glass */
+.glass-inset{
+  background:var(--glass-inset);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--r);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.4);
+}
+
+/* ---------- TYPE ---------- */
+h1,h2,h3,h4,h5{
+  font-family:var(--sans);
+  font-weight:650;
+  letter-spacing:-.021em;
+  line-height:1.18;
+  color:var(--ink);
+  margin:0 0 .5em;
+  text-wrap:balance;
+}
+h1{font-size:clamp(2rem,4.4vw,3.1rem);font-weight:700;letter-spacing:-.031em}
+h2{font-size:clamp(1.45rem,2.5vw,2rem)}
+h3{font-size:1.22rem}
+h4{font-size:1.04rem}
+p{margin:0 0 1.05em;color:var(--ink-2)}
+strong,b{color:var(--ink);font-weight:620}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(124,156,255,.32)}
+a:hover{border-bottom-color:var(--accent)}
+
+.eyebrow{
+  font-size:.7rem;font-weight:640;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 .7em;
+}
+.lede{font-size:1.09rem;color:var(--ink-2);max-width:68ch}
+
+/* ---------- CODE ---------- */
+code{
+  font-family:var(--mono);font-size:.875em;
+  font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.08);
+  padding:.12em .4em;border-radius:6px;color:#CFE0FF;
+}
+pre{
+  font-family:var(--mono);font-size:.845rem;line-height:1.62;
+  font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0;
+  margin:0;padding:18px 20px;overflow-x:auto;   /* never overflow the card */
+  background:var(--glass-inset);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--r);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.4);
+  color:#D6E2F5;max-width:100%;
+}
+pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
+pre::-webkit-scrollbar{height:9px}
+pre::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:9px}
+
+/* code token colours (manual spans) */
+.tk-key{color:#C3A6FF}.tk-str{color:#8FE3B0}.tk-num{color:#FFC98C}
+.tk-com{color:rgba(238,242,249,.34);font-style:italic}.tk-fn{color:#7FC9FF}
+
+/* ---------- PILLS / BADGES ---------- */
+.pill{
+  display:inline-flex;align-items:center;gap:.45em;
+  padding:.42em .85em;border-radius:999px;
+  background:var(--glass-raised);
+  border:1px solid var(--stroke);
+  box-shadow:var(--edge);
+  font-size:.8rem;color:var(--ink-2);white-space:nowrap;
+}
+.badge{
+  display:inline-flex;align-items:center;gap:.4em;
+  padding:.3em .72em;border-radius:999px;
+  font-size:.735rem;font-weight:640;letter-spacing:.045em;text-transform:uppercase;
+  border:1px solid transparent;
+}
+.badge-pass{background:rgba(74,222,128,.13);border-color:rgba(74,222,128,.34);color:#8FF0B4}
+.badge-warn{background:rgba(251,191,36,.13);border-color:rgba(251,191,36,.34);color:#FFD98A}
+.badge-fail{background:rgba(248,113,113,.13);border-color:rgba(248,113,113,.34);color:#FFA9A9}
+.badge-info{background:var(--accent-soft);border-color:rgba(124,156,255,.34);color:#B9CCFF}
+
+/* ---------- TABLES ---------- */
+.tbl-wrap{overflow-x:auto;border-radius:var(--r);}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+thead th{
+  text-align:left;padding:11px 14px;
+  background:rgba(255,255,255,.055);
+  border-bottom:1px solid var(--stroke-strong);
+  font-weight:620;font-size:.76rem;letter-spacing:.075em;text-transform:uppercase;color:var(--ink-2);
+  white-space:nowrap;
+}
+tbody td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.055);color:var(--ink-2);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:rgba(255,255,255,.032)}
+
+/* ---------- FIGURES ---------- */
+.figure{margin:1.6em 0}
+.figure .frame{
+  background:var(--glass-inset);
+  border:1px solid var(--stroke);
+  border-radius:var(--r);
+  padding:10px;box-shadow:var(--edge),0 10px 30px rgba(0,0,0,.35);
+  overflow:hidden;
+}
+.figure img{display:block;width:100%;height:auto;border-radius:10px}
+.figcap{margin-top:.7em;font-size:.83rem;color:var(--ink-3);text-align:center}
+
+/* ---------- SCROLL REVEAL ---------- */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .62s cubic-bezier(.22,.7,.3,1),transform .62s cubic-bezier(.22,.7,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- PROGRESS ---------- */
+.progress{
+  position:fixed;top:0;left:0;height:2px;z-index:100;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  box-shadow:0 0 12px rgba(124,156,255,.55);width:0;
+}
+
+/* ---------- SCROLLBAR ---------- */
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.13);border-radius:9px;border:3px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.22);background-clip:content-box}
+
+::selection{background:rgba(124,156,255,.32);color:#fff}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+}
+
+/* Neutral glass — for nav rails and chrome that must not pick up orb colour */
+.glass-neutral{
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.028)),rgba(8,11,19,.55);
+  -webkit-backdrop-filter:blur(28px) saturate(105%);
+  backdrop-filter:blur(28px) saturate(105%);
+  border:1px solid var(--stroke);
+  border-radius:var(--r-lg);
+  box-shadow:var(--edge),var(--drop);
+}
+
+/* ============================================================
+   Tutorial-page specific layout (built on the tokens above)
+   ============================================================ */
 
   /* ---------- layout ---------- */
   .shell {
@@ -77,15 +267,10 @@
   /* ---------- sidebar ---------- */
   .sidebar {
     position: sticky; top: 24px; align-self: start;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(20px) saturate(140%);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
-    border-radius: 18px;
     padding: 22px 18px;
-    box-shadow: var(--shadow);
     max-height: calc(100vh - 48px);
     overflow-y: auto;
+    min-width: 0;
   }
   @media (max-width: 920px) {
     .sidebar {
@@ -97,181 +282,125 @@
     .sidebar.open { max-height: 80vh; overflow-y: auto; }
   }
   .sidebar-brand {
-    font-family: var(--serif); font-size: 1.15rem; letter-spacing: 0.01em;
+    font-size: 1.05rem; font-weight: 650; letter-spacing: -.01em;
     display: flex; align-items: center; justify-content: space-between;
     color: var(--ink); margin-bottom: 14px;
   }
-  .sidebar-brand small { display:block; font-family: var(--sans); font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-2); margin-top: 2px; }
+  .sidebar-brand small { display:block; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-2); margin-top: 2px; font-weight: 640; }
   #navToggle {
-    display: none; background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
+    display: none; background: var(--glass-raised); border: 1px solid var(--stroke);
     color: var(--ink); border-radius: 8px; padding: 6px 10px; font-size: 0.8rem; cursor: pointer;
   }
   @media (max-width: 920px) { #navToggle { display: inline-block; } }
   .navlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
   .navlist a {
     display: block; padding: 7px 10px; border-radius: 9px;
-    color: var(--ink-dim); text-decoration: none; font-size: 0.85rem;
-    transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    color: var(--ink-2); text-decoration: none; font-size: 0.85rem; border-bottom: none;
+    transition: background 0.18s ease, color 0.18s ease;
     border: 1px solid transparent;
   }
-  .navlist a:hover { color: var(--ink); background: var(--glass-bg-strong); }
+  .navlist a:hover { color: var(--ink); background: rgba(255,255,255,.06); }
   .navlist a.active {
-    color: var(--bg-0); background: linear-gradient(120deg, var(--accent-2), var(--accent));
-    font-weight: 600; border-color: transparent;
+    background: var(--accent-soft);
+    border: 1px solid rgba(124,156,255,.28);
+    box-shadow: var(--edge);
+    color: #fff;
+    font-weight: 600;
   }
 
   /* ---------- main content ---------- */
   main { min-width: 0; }
 
-  .hero {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(20px) saturate(140%);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
-    border-radius: 24px;
-    padding: 48px 40px;
-    margin-bottom: 28px;
-    box-shadow: var(--shadow);
-  }
-  .hero .eyebrow {
-    font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--accent-2); margin-bottom: 14px; font-weight: 600;
-  }
-  .hero h1 {
-    font-family: var(--serif); font-weight: 600; font-size: clamp(2rem, 4.4vw, 3.2rem);
-    margin: 0 0 14px; line-height: 1.08; text-wrap: balance;
-    background: linear-gradient(120deg, #fff, var(--accent-2) 60%, var(--accent));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .hero p.lead { font-size: 1.05rem; color: var(--ink-dim); max-width: 62ch; margin: 0 0 18px; }
+  .hero { padding: 48px 40px; margin-bottom: 28px; }
+  .hero .eyebrow { margin-bottom: 14px; }
+  .hero h1 { margin: 0 0 14px; }
+  .hero p.lead { font-size: 1.05rem; color: var(--ink-2); max-width: 62ch; margin: 0 0 18px; }
   .hero-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
-  .pill {
-    font-size: 0.72rem; padding: 6px 14px; border-radius: 999px;
-    background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
-    color: var(--ink-dim); letter-spacing: 0.04em;
-  }
 
   section.chapter {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(20px) saturate(140%);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
-    border-radius: 22px;
-    padding: 38px 40px;
+    padding: 34px 36px;
     margin-bottom: 26px;
-    box-shadow: var(--shadow);
+    min-width: 0;
     opacity: 0; transform: translateY(28px);
     transition: opacity 0.7s ease, transform 0.7s ease;
   }
-  section.chapter.revealed { opacity: 1; transform: translateY(0); }
-  @media (max-width: 620px) { section.chapter, .hero { padding: 28px 20px; } }
+  section.chapter.revealed { opacity: 1; transform: none; }
+  @media (max-width: 620px) { section.chapter, .hero { padding: 26px 20px; } }
 
   .chapter .kicker {
-    font-family: var(--mono); font-size: 0.72rem; color: var(--accent-3);
+    font-family: var(--mono); font-size: 0.72rem; color: var(--accent-2);
     letter-spacing: 0.08em; margin-bottom: 6px;
   }
-  section.chapter h2 {
-    font-family: var(--serif); font-weight: 600; font-size: clamp(1.5rem, 2.6vw, 2.05rem);
-    margin: 0 0 18px; text-wrap: balance; color: #fff;
-  }
-  section.chapter h3 {
-    font-family: var(--serif); font-weight: 600; font-size: 1.25rem;
-    margin: 30px 0 12px; color: var(--accent-2);
-  }
-  section.chapter p { color: var(--ink-dim); max-width: 74ch; margin: 0 0 16px; }
-  section.chapter p strong, section.chapter li strong { color: var(--ink); }
-  section.chapter ul, section.chapter ol { color: var(--ink-dim); padding-left: 22px; margin: 0 0 16px; }
+  section.chapter h2 { margin: 0 0 18px; }
+  section.chapter h3 { margin: 30px 0 12px; color: var(--accent-2); }
+  section.chapter p { max-width: 74ch; }
+  section.chapter ul, section.chapter ol { color: var(--ink-2); padding-left: 22px; margin: 0 0 16px; }
   section.chapter li { margin-bottom: 8px; max-width: 72ch; }
-  section.chapter a { color: var(--accent-2); text-decoration: underline; text-decoration-color: rgba(110,231,212,0.4); text-underline-offset: 3px; }
-  section.chapter a:hover { text-decoration-color: var(--accent-2); }
+  section.chapter a { border-bottom: 1px solid rgba(78,216,196,0.4); color: var(--accent-2); }
+  section.chapter a:hover { border-bottom-color: var(--accent-2); }
 
   /* callout */
   .callout {
-    margin: 22px 0 6px; padding: 16px 20px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, rgba(167,139,250,0.14), rgba(110,231,212,0.09));
-    border: 1px solid rgba(167,139,250,0.35);
+    margin: 22px 0 6px; padding: 16px 20px 16px 18px;
+    border-left: 3px solid var(--accent);
   }
-  .callout strong { color: var(--accent-2); }
-  .callout p { margin: 6px 0 0; color: var(--ink); }
+  .callout .eyebrow { display: block; margin: 0 0 .35em; }
+  .callout p { margin: 0; color: var(--ink); }
 
   /* tables */
-  .tablewrap { overflow-x: auto; margin: 16px 0 22px; border-radius: 12px; border: 1px solid var(--glass-border); }
-  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; min-width: 480px; }
-  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--glass-border); color: var(--ink-dim); }
-  th { color: var(--accent-2); font-weight: 600; background: rgba(255,255,255,0.03); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
-  tr:last-child td { border-bottom: none; }
-  td strong, td code { color: var(--ink); }
+  .tablewrap { margin: 16px 0 22px; }
+  table { min-width: 480px; }
 
   /* code blocks */
-  .codeblock {
-    position: relative; margin: 16px 0 20px;
-    background: var(--code-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 14px;
-    overflow: hidden;
-  }
+  .codeblock { position: relative; margin: 16px 0 20px; overflow: hidden; }
   .codeblock .code-head {
     display: flex; align-items: center; justify-content: space-between;
     padding: 8px 14px; font-family: var(--mono); font-size: 0.7rem;
-    color: var(--ink-faint); border-bottom: 1px solid var(--glass-border);
+    color: var(--ink-3); border-bottom: 1px solid var(--stroke);
     background: rgba(255,255,255,0.02);
   }
-  .codeblock pre {
-    margin: 0; padding: 16px 18px; overflow-x: auto;
-    font-family: var(--mono); font-size: 0.82rem; line-height: 1.6;
-    color: #d8d4f5;
-  }
-  .codeblock code .tok-kw { color: #f0a8d0; }
-  .codeblock code .tok-str { color: #9be3a0; }
-  .codeblock code .tok-com { color: #7c76a0; font-style: italic; }
-  .codeblock code .tok-fn { color: #6ee7d4; }
-  .codeblock code .tok-num { color: #ffcb87; }
+  .codeblock pre { border: 0; border-radius: 0; box-shadow: none; }
+  .codeblock code .tok-kw { color: #C3A6FF; }
+  .codeblock code .tok-str { color: #8FE3B0; }
+  .codeblock code .tok-com { color: rgba(238,242,249,.34); font-style: italic; }
+  .codeblock code .tok-fn { color: #7FC9FF; }
+  .codeblock code .tok-num { color: #FFC98C; }
   .copy-btn {
+    position: absolute; top: 10px; right: 12px; z-index: 2;
     font-family: var(--sans); font-size: 0.7rem; letter-spacing: 0.04em;
-    background: var(--glass-bg-strong); color: var(--ink-dim);
-    border: 1px solid var(--glass-border); border-radius: 7px;
-    padding: 4px 10px; cursor: pointer; transition: all 0.15s ease;
+    cursor: pointer; opacity: .72; transition: opacity 0.15s ease;
   }
-  .copy-btn:hover { color: #fff; border-color: var(--accent-2); }
-  .copy-btn.copied { color: var(--bg-0); background: var(--accent-2); border-color: var(--accent-2); }
-  code.inline { font-family: var(--mono); font-size: 0.86em; background: rgba(255,255,255,0.08); padding: 1px 6px; border-radius: 5px; color: var(--accent-2); }
+  .codeblock .code-head .copy-btn { position: static; }
+  .copy-btn:hover { opacity: 1; color: #fff; border-color: var(--accent-2); }
+  .copy-btn.copied { color: var(--bg-0); background: var(--accent-2); border-color: var(--accent-2); opacity: 1; }
+  code.inline { color: var(--accent-2); }
 
-  pre.diagram {
-    font-family: var(--mono); font-size: 0.76rem; line-height: 1.5;
-    background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 14px;
-    padding: 20px; overflow-x: auto; color: var(--ink-dim); margin: 16px 0 22px;
-  }
+  pre.diagram { margin: 16px 0 22px; }
 
   .exercise {
-    display: flex; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--glass-border);
+    display: flex; gap: 14px; padding: 16px 18px; margin-bottom: 10px;
   }
-  .exercise:last-child { border-bottom: none; }
-  .exercise .diff { font-family: var(--mono); font-size: 0.85rem; color: var(--accent-3); flex-shrink: 0; width: 68px; }
+  .exercise .diff { font-family: var(--mono); font-size: 0.85rem; color: var(--accent); flex-shrink: 0; width: 68px; }
   .exercise .body strong { display: block; color: var(--ink); margin-bottom: 4px; }
   .exercise .body p { margin: 0 0 4px; font-size: 0.92rem; }
-  .exercise .hint { font-size: 0.82rem; color: var(--ink-faint); font-style: italic; }
+  .exercise .hint { font-size: 0.82rem; color: var(--ink-3); font-style: italic; }
 
   dl.glossary { display: grid; gap: 14px; }
-  dl.glossary dt { font-family: var(--mono); color: var(--accent-2); font-size: 0.92rem; margin-bottom: 3px; }
-  dl.glossary dd { margin: 0; color: var(--ink-dim); font-size: 0.92rem; max-width: 70ch; }
+  dl.glossary dt { font-family: var(--mono); color: var(--accent-2); font-size: 0.92rem; margin-bottom: 3px; font-weight: 620; }
+  dl.glossary dd { margin: 0; color: var(--ink-2); font-size: 0.92rem; max-width: 70ch; }
 
   footer.end {
-    text-align: center; color: var(--ink-faint); font-size: 0.8rem;
+    text-align: center; color: var(--ink-3); font-size: 0.8rem;
     padding: 30px 0 10px; position: relative; z-index: 1;
   }
-  footer.end a { color: var(--accent-2); }
 </style>
 
-<div class="blobs">
-  <div class="blob b1"></div>
-  <div class="blob b2"></div>
-  <div class="blob b3"></div>
-</div>
-<div id="progress"></div>
+<div class="bg-field"><div class="orb a"></div><div class="orb b"></div><div class="orb c"></div></div>
+<div class="bg-grain"></div>
+<div id="progress" class="progress"></div>
 
 <div class="shell">
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar glass-neutral" id="sidebar">
     <div class="sidebar-brand">
       <div>Outfleek<small>Learning Tutorial</small></div>
       <button id="navToggle" aria-label="Toggle navigation">☰</button>
@@ -294,7 +423,7 @@
   </aside>
 
   <main>
-    <div class="hero">
+    <div class="hero glass-raised">
       <div class="eyebrow">Learn a real production app</div>
       <h1>The Outfleek Tutorial</h1>
       <p class="lead">
@@ -314,12 +443,12 @@
     </div>
 
     <!-- ===================== CH 0 ===================== -->
-    <section class="chapter" id="ch0">
+    <section class="chapter glass" id="ch0">
       <div class="kicker">CHAPTER 0</div>
       <h2>Getting the project running</h2>
       <p>Four commands, in order, get you from a clone to a running store.</p>
       <div class="codeblock">
-        <div class="code-head"><span>bash</span><button class="copy-btn">Copy</button></div>
+        <div class="code-head"><span>bash</span><button class="copy-btn pill">Copy</button></div>
         <pre><code>git clone https://github.com/vampxlr/outfleek.git
 cd outfleek
 npm install
@@ -338,15 +467,15 @@ npm run dev               <span class="tok-com"># -> http://localhost:3000</span
       </div>
       <p>Visit <code class="inline">/</code> for the store and <code class="inline">/admin</code> to log in with the password from step 3.</p>
       <p>By the end of this tutorial you'll be able to: explain the app's three surfaces, read <code class="inline">convex/schema.ts</code> and know what an index does, trace an order end-to-end including its Meta tracking event, explain why prices are never trusted from the browser, name Framer Motion's core animation props, explain event deduplication well enough to teach it, write a unit test for a pricing rule, and make safe, deliberate changes to the codebase.</p>
-      <div class="callout"><strong>💡 Why this matters —</strong><p><code class="inline">npx convex dev</code> isn't background noise: it's a live connection that also pushes your backend code on every save. Without it, nothing works — not even locally.</p></div>
+      <div class="callout glass-inset"><span class="eyebrow">💡 Why this matters</span><p><code class="inline">npx convex dev</code> isn't background noise: it's a live connection that also pushes your backend code on every save. Without it, nothing works — not even locally.</p></div>
     </section>
 
     <!-- ===================== CH 1 ===================== -->
-    <section class="chapter" id="ch1">
+    <section class="chapter glass" id="ch1">
       <div class="kicker">CHAPTER 1</div>
       <h2>The big picture</h2>
       <p>Outfleek isn't one app — it's <strong>three surfaces</strong> sharing one backend:</p>
-      <div class="tablewrap"><table>
+      <div class="tablewrap tbl-wrap"><table>
         <tr><th>Surface</th><th>Route</th><th>Audience</th><th>Purpose</th></tr>
         <tr><td>Storefront</td><td><code class="inline">/</code>, <code class="inline">/product/[slug]</code>, <code class="inline">/checkout</code></td><td>Shoppers</td><td>Browse, cart, pay COD/bKash, track order</td></tr>
         <tr><td>Admin panel</td><td><code class="inline">/admin/*</code></td><td>Store owner</td><td>Products, orders, settings, tracking</td></tr>
@@ -365,16 +494,16 @@ npm run dev               <span class="tok-com"># -> http://localhost:3000</span
                                              └───────────────────┘</pre>
       <h3>Why Convex instead of REST + Postgres?</h3>
       <p>A traditional stack needs an ORM, a database, hand-wired websockets for the live admin dashboard, and a separate job queue (Redis + BullMQ) for retrying failed Meta calls — four moving pieces. Convex collapses all of it: <strong>reactivity</strong> is built into every <code class="inline">useQuery</code>, the <strong>scheduler</strong> replaces the job queue (<code class="inline">ctx.scheduler.runAfter</code>), <strong>file storage</strong> is built in for product photos, and there's <strong>no ORM or migrations</strong> — <code class="inline">schema.ts</code> is the schema.</p>
-      <div class="callout"><strong>💡 Why this matters —</strong><p>For a small team shipping a COD store, every piece of infrastructure you don't have to run is one less thing that can go down at 11pm mid-order.</p></div>
+      <div class="callout glass-inset"><span class="eyebrow">💡 Why this matters</span><p>For a small team shipping a COD store, every piece of infrastructure you don't have to run is one less thing that can go down at 11pm mid-order.</p></div>
     </section>
 
     <!-- ===================== CH 2 ===================== -->
-    <section class="chapter" id="ch2">
+    <section class="chapter glass" id="ch2">
       <div class="kicker">CHAPTER 2</div>
       <h2>Next.js App Router basics as used here</h2>
       <p>Folders under <code class="inline">app/</code> become routes. <code class="inline">[slug]</code> is a <strong>dynamic segment</strong> — <code class="inline">app/product/[slug]/page.tsx</code> renders for any product slug, reading <code class="inline">params.slug</code> and asking Convex for that one product.</p>
       <div class="codeblock">
-        <div class="code-head"><span>app/ (excerpt)</span><button class="copy-btn">Copy</button></div>
+        <div class="code-head"><span>app/ (excerpt)</span><button class="copy-btn pill">Copy</button></div>
         <pre><code>app/page.tsx                  -&gt;  /            (home = product listing)
 app/layout.tsx                    (wraps every page)
 app/providers.tsx                 (client-side context)
@@ -387,7 +516,7 @@ app/(policies)/privacy/page.tsx -&gt; /privacy   (parens = not in the URL)</code
       <p>By default App Router components are <strong>Server Components</strong>: rendered on the server, zero JS shipped for their own logic, no <code class="inline">useState</code>/browser APIs. Adding <code class="inline">"use client"</code> at the top opts a component (and its subtree) into the browser.</p>
       <p>Nearly every page here starts with it, because the app is built around <strong>live Convex queries</strong>, <strong>browser state</strong> (the Zustand cart), and <strong>browser-only tracking</strong> (pixel, cookies) — none of which a server component can do.</p>
       <div class="codeblock">
-        <div class="code-head"><span>app/providers.tsx</span><button class="copy-btn">Copy</button></div>
+        <div class="code-head"><span>app/providers.tsx</span><button class="copy-btn pill">Copy</button></div>
         <pre><code><span class="tok-kw">export function</span> <span class="tok-fn">Providers</span>({ children }: { children: ReactNode }) {
   <span class="tok-kw">const</span> client = useMemo(
     () =&gt; <span class="tok-kw">new</span> ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL <span class="tok-kw">as</span> <span class="tok-kw">string</span>),
@@ -401,14 +530,14 @@ app/(policies)/privacy/page.tsx -&gt; /privacy   (parens = not in the URL)</code
 }</code></pre>
       </div>
       <p><code class="inline">app/layout.tsx</code> stays a server component (sets <code class="inline">&lt;html&gt;</code>/metadata for SEO) and wraps everything in <code class="inline">&lt;Providers&gt;</code>, which creates <strong>one</strong> <code class="inline">ConvexReactClient</code> for the whole tree and fires a Pixel <code class="inline">PageView</code> on every route change.</p>
-      <div class="callout"><strong>💡 Why this matters —</strong><p><code class="inline">"use client"</code> is a trade-off, not a style rule: this app trades server rendering for "always-live everywhere," which is the right call for a fast-moving small catalog.</p></div>
+      <div class="callout glass-inset"><span class="eyebrow">💡 Why this matters</span><p><code class="inline">"use client"</code> is a trade-off, not a style rule: this app trades server rendering for "always-live everywhere," which is the right call for a fast-moving small catalog.</p></div>
     </section>
 
     <!-- ===================== CH 3 ===================== -->
-    <section class="chapter" id="ch3">
+    <section class="chapter glass" id="ch3">
       <div class="kicker">CHAPTER 3</div>
       <h2>Convex: the backend</h2>
-      <div class="tablewrap"><table>
+      <div class="tablewrap tbl-wrap"><table>
         <tr><th>Block</th><th>What it is</th><th>Example</th></tr>
         <tr><td>schema</td><td>Declares tables, types, indexes</td><td><code class="inline">convex/schema.ts</code></td></tr>
         <tr><td>query</td><td>Reactive read; auto re-runs on the client</td><td><code class="inline">products.list</code></td></tr>
@@ -419,7 +548,7 @@ app/(policies)/privacy/page.tsx -&gt; /privacy   (parens = not in the URL)</code
 
       <h3>Reading the schema: why indexes exist</h3>
       <div class="codeblock">
-        <div class="code-head"><span>convex/schema.ts</span><button class="copy-btn">Copy</button></div>
+        <div class="code-head"><span>convex/schema.ts</span><button class="copy-btn pill">Copy</button></div>
         <pre><code>products: defineTable({
   name: v.string(), slug: v.string(), price: v.number(),
   variants: v.array(variant),  <span class="tok-com">// { size, color, stock } — embedded, not a join table</span>
@@ -433,7 +562,7 @@ app/(policies)/privacy/page.tsx -&gt; /privacy   (parens = not in the URL)</code
       <h3><code class="inline">orders.place</code> — the most important function in the codebase</h3>
       <p>One mutation, seven steps: validate phone/cart → resolve landing page → loop cart items, check + decrement stock, price server-side → apply promo → compute delivery fee → insert order + mark abandoned-checkout converted → schedule the Meta Purchase event.</p>
       <div class="codeblock">
-        <div class="code-head"><span>convex/orders.ts (excerpt)</span><button class="copy-btn">Copy</button></div>
+        <div class="code-head"><span>convex/orders.ts (excerpt)</span><button class="copy-btn pill">Copy</button></div>
         <pre><code><span class="tok-kw">for</span> (<span class="tok-kw">const</span> it <span class="tok-kw">of</span> args.items) {
   <span class="tok-kw">const</span> p = <span class="tok-kw">await</span> ctx.db.get(it.productId);
   <span class="tok-kw">if</span> (!p || !p.active) <span class="tok-kw">throw new</span> Error(<span class="tok-str">"Product unavailable"</span>);
@@ -454,16 +583,16 @@ app/(policies)/privacy/page.tsx -&gt; /privacy   (parens = not in the URL)</code
       <p><em>See <a href="https://github.com/vampxlr/outfleek/blob/main/convex/orders.ts" target="_blank" rel="noopener">the full function in the repo</a> for promo and delivery-fee handling.</em></p>
       <p><strong>Why one mutation?</strong> A Convex mutation is <strong>atomic</strong> — every write inside it commits together or not at all. Two customers buying the last unit at once is handled correctly for free: whoever's mutation runs second sees the decremented stock and throws before an order is created.</p>
       <p><strong>Why is the CAPI call scheduled, not awaited?</strong> Mutations can't <code class="inline">fetch()</code> at all — only actions can reach the network — and even if they could, a slow Meta API would make the order itself hang. Scheduling means the order always writes fast, and the Meta call retries independently.</p>
-      <div class="callout"><strong>💡 Why this matters —</strong><p>Things that must succeed-or-fail together go in one mutation; things allowed to fail independently and retry get scheduled out. This distinction shows up in almost every backend you'll ever build.</p></div>
+      <div class="callout glass-inset"><span class="eyebrow">💡 Why this matters</span><p>Things that must succeed-or-fail together go in one mutation; things allowed to fail independently and retry get scheduled out. This distinction shows up in almost every backend you'll ever build.</p></div>
     </section>
 
     <!-- ===================== CH 4 ===================== -->
-    <section class="chapter" id="ch4">
+    <section class="chapter glass" id="ch4">
       <div class="kicker">CHAPTER 4</div>
       <h2>State on the client</h2>
       <p>The cart lives in the browser in a <strong>Zustand</strong> store (<code class="inline">lib/cart.ts</code>), persisted to <code class="inline">localStorage</code>:</p>
       <div class="codeblock">
-        <div class="code-head"><span>lib/cart.ts</span><button class="copy-btn">Copy</button></div>
+        <div class="code-head"><span>lib/cart.ts</span><button class="copy-btn pill">Copy</button></div>
         <pre><code><span class="tok-kw">export const</span> useCart = create&lt;CartState&gt;()(
   persist(
     (set) =&gt; ({
@@ -478,23 +607,23 @@ app/(policies)/privacy/page.tsx -&gt; /privacy   (parens = not in the URL)</code
       <h3>The security lesson: never trust the client's price</h3>
       <p>Every <code class="inline">CartItem</code> carries a <code class="inline">price</code> field — but it's only ever a <strong>preview</strong>. Look at what <code class="inline">orders.place</code> actually accepts:</p>
       <div class="codeblock">
-        <div class="code-head"><span>convex/orders.ts — mutation args</span><button class="copy-btn">Copy</button></div>
+        <div class="code-head"><span>convex/orders.ts — mutation args</span><button class="copy-btn pill">Copy</button></div>
         <pre><code>items: v.array(
   v.object({ productId: v.id(<span class="tok-str">"products"</span>), qty: v.number(), size: v.string(), color: v.optional(v.string()) })
 ),
 <span class="tok-com">// no "price" field — the server refuses to even accept one</span></code></pre>
       </div>
       <p>If someone opened devtools and submitted <code class="inline">price: 1</code> for a ৳590 t-shirt, it would be silently ignored — the mutation reads <code class="inline">p.price</code> straight from the database, never from the client.</p>
-      <div class="callout"><strong>💡 Why this matters —</strong><p>Any value that affects money, permissions, or ownership must be recomputed or re-checked on the server, every time, no exceptions. The client is a UI, not a source of truth.</p></div>
+      <div class="callout glass-inset"><span class="eyebrow">💡 Why this matters</span><p>Any value that affects money, permissions, or ownership must be recomputed or re-checked on the server, every time, no exceptions. The client is a UI, not a source of truth.</p></div>
     </section>
 
     <!-- ===================== CH 5 ===================== -->
-    <section class="chapter" id="ch5">
+    <section class="chapter glass" id="ch5">
       <div class="kicker">CHAPTER 5</div>
       <h2>Animation with Framer Motion</h2>
       <h3>1 · <code class="inline">whileInView</code> scroll reveals with stagger</h3>
       <div class="codeblock">
-        <div class="code-head"><span>components/store/Reveal.tsx</span><button class="copy-btn">Copy</button></div>
+        <div class="code-head"><span>components/store/Reveal.tsx</span><button class="copy-btn pill">Copy</button></div>
         <pre><code>&lt;motion.div
   initial={{ opacity: <span class="tok-num">0</span>, y: <span class="tok-num">26</span> }}
   whileInView={{ opacity: <span class="tok-num">1</span>, y: <span class="tok-num">0</span> }}
@@ -508,7 +637,7 @@ app/(policies)/privacy/page.tsx -&gt; /privacy   (parens = not in the URL)</code
       <h3>2 · <code class="inline">AnimatePresence</code> for the cart drawer</h3>
       <p>Plain React can't animate an element <em>leaving</em> the DOM — by the time an exit animation would run, it's already gone. <code class="inline">AnimatePresence</code> keeps it mounted until the <code class="inline">exit</code> animation finishes.</p>
       <div class="codeblock">
-        <div class="code-head"><span>components/store/CartDrawer.tsx</span><button class="copy-btn">Copy</button></div>
+        <div class="code-head"><span>components/store/CartDrawer.tsx</span><button class="copy-btn pill">Copy</button></div>
         <pre><code>&lt;AnimatePresence&gt;
   {drawerOpen &amp;&amp; (
     &lt;motion.aside
@@ -525,11 +654,11 @@ app/(policies)/privacy/page.tsx -&gt; /privacy   (parens = not in the URL)</code
       <p>The drawer literally slides off-screen rather than vanishing — the checkout page uses the same pattern for its error banner and its bKash fields sliding open (<code class="inline">height: 0 → "auto"</code>).</p>
       <h3>3 · Staggered word-by-word hero reveal</h3>
       <p>The homepage hero splits its headline into words, each getting <code class="inline">delay: baseDelay + i * 0.07</code> — no stagger helper needed, just arithmetic on <code class="inline">delay</code>.</p>
-      <div class="callout"><strong>💡 Why this matters —</strong><p>These three patterns cover almost every animation in the app: they're declarative React state (<code class="inline">initial</code>/<code class="inline">animate</code>/<code class="inline">exit</code>), the same mental model as <code class="inline">useState</code>.</p></div>
+      <div class="callout glass-inset"><span class="eyebrow">💡 Why this matters</span><p>These three patterns cover almost every animation in the app: they're declarative React state (<code class="inline">initial</code>/<code class="inline">animate</code>/<code class="inline">exit</code>), the same mental model as <code class="inline">useState</code>.</p></div>
     </section>
 
     <!-- ===================== CH 6 ===================== -->
-    <section class="chapter" id="ch6">
+    <section class="chapter glass" id="ch6">
       <div class="kicker">CHAPTER 6</div>
       <h2>Payments & the Bangladeshi context</h2>
       <p><strong>Why COD dominates:</strong> low card penetration and low trust in prepayment mean most Bangladeshi shoppers want to inspect goods before paying the courier. COD is the default payment method in checkout — any store requiring upfront payment loses most of its addressable market here.</p>
@@ -537,16 +666,16 @@ app/(policies)/privacy/page.tsx -&gt; /privacy   (parens = not in the URL)</code
       <p><strong>Manual bKash verification:</strong> instead of integrating bKash's payment gateway, the store shows its bKash number and instructions; the customer sends money, then types back their own bKash number and transaction ID (TrxID). The order lands with <code class="inline">payment.verified: false</code> until an admin checks their real bKash history and flips it — cheaper and faster to ship than a gateway integration.</p>
       <p><strong>Delivery-zone fees and the free-delivery threshold:</strong> <code class="inline">lib/pricing.ts</code>'s <code class="inline">calcDeliveryFee</code> charges an inside/outside-Dhaka fee, waived once <code class="inline">subtotal − discount ≥ freeThreshold</code> — all three numbers are admin-configurable, since delivery pricing changes with courier contracts.</p>
       <p><strong>Why abandoned-checkout capture matters for COD:</strong> "placing an order" and "paying" are separate moments — a customer who types a valid phone but never submits is highly recoverable by a phone call. Checkout debounces a save to <code class="inline">abandonedCheckouts</code> the moment the phone is valid, and <code class="inline">orders.place</code> marks it converted if they do complete.</p>
-      <div class="callout"><strong>💡 Why this matters —</strong><p>Every one of these decisions traces back to how Bangladeshi shoppers actually buy. A generic Shopify-style flow built without that context would convert worse here.</p></div>
+      <div class="callout glass-inset"><span class="eyebrow">💡 Why this matters</span><p>Every one of these decisions traces back to how Bangladeshi shoppers actually buy. A generic Shopify-style flow built without that context would convert worse here.</p></div>
     </section>
 
     <!-- ===================== CH 7 ===================== -->
-    <section class="chapter" id="ch7">
+    <section class="chapter glass" id="ch7">
       <div class="kicker">CHAPTER 7</div>
       <h2>The landing-page builder</h2>
       <p>A landing page is a standalone, single-product funnel at <code class="inline">/l/[slug]</code>. The <code class="inline">landingPages</code> table doesn't store hardcoded components per page — it stores a <code class="inline">sections</code> array of typed content blobs:</p>
       <div class="codeblock">
-        <div class="code-head"><span>convex/schema.ts</span><button class="copy-btn">Copy</button></div>
+        <div class="code-head"><span>convex/schema.ts</span><button class="copy-btn pill">Copy</button></div>
         <pre><code><span class="tok-kw">const</span> landingSection = v.object({
   type: v.union(v.literal(<span class="tok-str">"hero"</span>), v.literal(<span class="tok-str">"benefits"</span>), v.literal(<span class="tok-str">"gallery"</span>),
     v.literal(<span class="tok-str">"reviews"</span>), v.literal(<span class="tok-str">"offer"</span>), v.literal(<span class="tok-str">"sizeChart"</span>),
@@ -558,11 +687,11 @@ app/(policies)/privacy/page.tsx -&gt; /privacy   (parens = not in the URL)</code
       <p><code class="inline">components/landing/LandingPage.tsx</code> maps each <code class="inline">type</code> to a matching React component (<code class="inline">Hero</code>, <code class="inline">Benefits</code>, <code class="inline">Gallery</code>…), reading whatever it needs from <code class="inline">content</code>. Building a new landing page is then admin work — pick a product, toggle sections, publish — <strong>no code, no deploy.</strong></p>
       <p>This is a <strong>data-driven UI</strong>: the page's shape lives in the database as data, and the frontend is a generic renderer. The alternative (one React page per campaign) would mean a deploy for every new ad test — far too slow for someone running dozens of ad variants a week.</p>
       <p>Each landing page can also set <code class="inline">priceOverride</code>/<code class="inline">deliveryFeeOverride</code> — honored both in the display query <em>and</em>, critically, re-checked server-side inside <code class="inline">orders.place</code> itself, so the override can never be spoofed by the client. Stats (<code class="inline">views</code>, <code class="inline">initiates</code>, <code class="inline">ordersCount</code>) power a per-page conversion rate on the admin dashboard.</p>
-      <div class="callout"><strong>💡 Why this matters —</strong><p>If a non-developer will need to create many similar variations of something frequently, model it as data and build one renderer — don't write bespoke code per instance.</p></div>
+      <div class="callout glass-inset"><span class="eyebrow">💡 Why this matters</span><p>If a non-developer will need to create many similar variations of something frequently, model it as data and build one renderer — don't write bespoke code per instance.</p></div>
     </section>
 
     <!-- ===================== CH 8 ===================== -->
-    <section class="chapter" id="ch8">
+    <section class="chapter glass" id="ch8">
       <div class="kicker">CHAPTER 8</div>
       <h2>Meta Pixel + Conversions API</h2>
       <p>The <strong>Pixel</strong> is browser JavaScript that fires events like <code class="inline">fbq('track', 'Purchase', …)</code>. Ad blockers, iOS App Tracking Transparency, and Safari's tracking prevention all quietly drop these — every lost event makes Meta's ad optimization worse.</p>
@@ -570,7 +699,7 @@ app/(policies)/privacy/page.tsx -&gt; /privacy   (parens = not in the URL)</code
       <h3>The key concept: one <code class="inline">event_id</code>, sent to both sides</h3>
       <p>If both the browser and the server fire <code class="inline">Purchase</code> and Meta can't tell they're the same sale, it counts it <strong>twice</strong>. The fix is <strong>deduplication</strong>: both calls carry the exact same <code class="inline">event_id</code>, and Meta discards the second one it receives.</p>
       <div class="codeblock">
-        <div class="code-head"><span>app/checkout/page.tsx</span><button class="copy-btn">Copy</button></div>
+        <div class="code-head"><span>app/checkout/page.tsx</span><button class="copy-btn pill">Copy</button></div>
         <pre><code><span class="tok-kw">const</span> eventId = uuid();
 <span class="tok-kw">const</span> res = <span class="tok-kw">await</span> placeOrder({ ...,  tracking: { eventId, ...getTrackingContext() } });
 <span class="tok-com">// same id, fired to the browser pixel after the order succeeds:</span>
@@ -579,7 +708,7 @@ window.fbq?.(<span class="tok-str">"track"</span>, <span class="tok-str">"Purcha
       <p>The server receives that same id as <code class="inline">args.tracking.eventId</code> in <code class="inline">orders.place</code> and passes it straight into the scheduled CAPI call.</p>
       <h3>PII hashing — on the server, never the browser</h3>
       <div class="codeblock">
-        <div class="code-head"><span>convex/capi.ts</span><button class="copy-btn">Copy</button></div>
+        <div class="code-head"><span>convex/capi.ts</span><button class="copy-btn pill">Copy</button></div>
         <pre><code><span class="tok-kw">function</span> <span class="tok-fn">sha256</span>(s) { <span class="tok-kw">return</span> createHash(<span class="tok-str">"sha256"</span>).update(s).digest(<span class="tok-str">"hex"</span>); }
 
 <span class="tok-kw">const</span> ph = sha256(normalizeBDPhone(args.customer.phone));
@@ -590,7 +719,7 @@ user_data.external_id = [ph];  <span class="tok-com">// stable customer key — 
       <h3><code class="inline">fbclid</code> → <code class="inline">_fbc</code> capture</h3>
       <p>When someone clicks a Facebook ad, the URL carries <code class="inline">?fbclid=…</code>. The project's own requirements call this out as <strong>"the biggest EMQ lever for a COD store"</strong> — since there's no email-based matching fallback here:</p>
       <div class="codeblock">
-        <div class="code-head"><span>lib/tracking.ts</span><button class="copy-btn">Copy</button></div>
+        <div class="code-head"><span>lib/tracking.ts</span><button class="copy-btn pill">Copy</button></div>
         <pre><code><span class="tok-kw">const</span> fbclid = params.get(<span class="tok-str">"fbclid"</span>);
 <span class="tok-kw">if</span> (fbclid &amp;&amp; !readCookie(<span class="tok-str">"_fbc"</span>)) {
   <span class="tok-kw">const</span> fbc = <span class="tok-str">`fb.1.${Date.now()}.${fbclid}`</span>;
@@ -599,11 +728,11 @@ user_data.external_id = [ph];  <span class="tok-com">// stable customer key — 
       </div>
       <p><strong>Why Purchase is fired server-side:</strong> <code class="inline">orders.place</code> schedules the CAPI Purchase as part of creating the order, making the server the source of truth for whether a sale happened. The browser pixel fire is a redundant duplicate for dedup — if the tab crashes right after checkout, Meta still records the sale.</p>
       <p>Failed CAPI calls retry up to 3 times with backoff and log every attempt to <code class="inline">capiLogs</code>, visible on the admin's Tracking Debug page.</p>
-      <div class="callout"><strong>💡 Why this matters —</strong><p>"One shared ID across two systems so a downstream consumer can dedupe" is a general distributed-systems pattern — you'll meet it again as "idempotency keys" in payment processors and webhooks.</p></div>
+      <div class="callout glass-inset"><span class="eyebrow">💡 Why this matters</span><p>"One shared ID across two systems so a downstream consumer can dedupe" is a general distributed-systems pattern — you'll meet it again as "idempotency keys" in payment processors and webhooks.</p></div>
     </section>
 
     <!-- ===================== CH 9 ===================== -->
-    <section class="chapter" id="ch9">
+    <section class="chapter glass" id="ch9">
       <div class="kicker">CHAPTER 9</div>
       <h2>Testing</h2>
       <p>A <strong>unit test</strong> calls one small piece of code directly — no browser, no server, no database — and asserts the output. <code class="inline">tests/unit/*.test.ts</code> runs on Vitest (<code class="inline">npm test</code>).</p>
@@ -614,7 +743,7 @@ user_data.external_id = [ph];  <span class="tok-com">// stable customer key — 
       <h3>Boundary value analysis</h3>
       <p>Testing values right at, just below, and just above a threshold — off-by-one bugs live exactly there. The free-delivery threshold (৳2000) is tested at all three points:</p>
       <div class="codeblock">
-        <div class="code-head"><span>tests/unit/pricing.test.ts</span><button class="copy-btn">Copy</button></div>
+        <div class="code-head"><span>tests/unit/pricing.test.ts</span><button class="copy-btn pill">Copy</button></div>
         <pre><code><span class="tok-fn">it</span>(<span class="tok-str">"is free at exactly the threshold (boundary: 2000)"</span>, () =&gt; {
   expect(calcDeliveryFee({ ...base, subtotal: <span class="tok-num">2000</span>, discount: <span class="tok-num">0</span>, area: <span class="tok-str">"dhaka"</span> })).toBe(<span class="tok-num">0</span>);
 });
@@ -627,15 +756,15 @@ user_data.external_id = [ph];  <span class="tok-com">// stable customer key — 
       </div>
       <p>This proves the comparison uses <code class="inline">&gt;=</code>, not <code class="inline">&gt;</code> — a one-character bug these three tests would catch if someone "simplified" the operator later. A similar boundary sweep tests every valid/invalid Bangladeshi phone prefix (<code class="inline">013</code>–<code class="inline">019</code> valid, <code class="inline">011</code>/<code class="inline">012</code> invalid, chosen because they're adjacent to the boundary).</p>
       <p>A <strong>regression</strong> is a previously-fixed bug reappearing after a later change — the reason this whole suite re-runs on every future edit instead of being a one-time manual check.</p>
-      <div class="callout"><strong>💡 Why this matters —</strong><p>Knowing which parts of your code are cheap to test — and designing more of your code to be like that — is the difference between a codebase you can change confidently and one everyone's afraid to touch.</p></div>
+      <div class="callout glass-inset"><span class="eyebrow">💡 Why this matters</span><p>Knowing which parts of your code are cheap to test — and designing more of your code to be like that — is the difference between a codebase you can change confidently and one everyone's afraid to touch.</p></div>
     </section>
 
     <!-- ===================== CH 10 ===================== -->
-    <section class="chapter" id="ch10">
+    <section class="chapter glass" id="ch10">
       <div class="kicker">CHAPTER 10</div>
       <h2>Deployment</h2>
       <p><code class="inline">npx convex dev</code> connects to a personal <strong>dev deployment</strong>; <code class="inline">npx convex deploy</code> pushes to a separate <strong>production deployment</strong> with its own URL and env vars — a dev mistake can't leak into prod. <strong>Vercel</strong> hosts the Next.js frontend and needs <code class="inline">NEXT_PUBLIC_CONVEX_URL</code> pointed at the production Convex deployment.</p>
-      <div class="tablewrap"><table>
+      <div class="tablewrap tbl-wrap"><table>
         <tr><th>Variable</th><th>Set where</th><th>Why</th></tr>
         <tr><td><code>NEXT_PUBLIC_CONVEX_URL</code></td><td>.env.local (dev) / Vercel settings (prod)</td><td>Frontend needs it to open the Convex connection</td></tr>
         <tr><td><code>ADMIN_PASSWORD</code></td><td><code>npx convex env set</code></td><td>Read server-side only, never shipped to the browser</td></tr>
@@ -644,27 +773,27 @@ user_data.external_id = [ph];  <span class="tok-com">// stable customer key — 
       <h3>A real class of deploy bug: invisible characters in env vars</h3>
       <p>A classic Windows pitfall: PowerShell's default text encoding can prepend an invisible <strong>UTF-8 BOM</strong> when writing an env-var value through certain commands (<code class="inline">Out-File</code>, <code class="inline">Set-Content</code> without an explicit encoding, some pipe redirections). The value looks visually identical in your editor — but Convex's client-side URL parsing rejects it outright, with a generic error that gives no hint the real problem is an invisible leading byte.</p>
       <p>The fix once you know to look for it: regenerate the value through a BOM-safe path (Convex's own <code class="inline">.env.local</code> writer is safe), or strip it programmatically.</p>
-      <div class="callout"><strong>💡 Why this matters —</strong><p>"A value that looks right in every tool you check it with, but fails a strict parser" is common enough (trailing whitespace, wrong line endings, invisible Unicode) that "diff the raw bytes, not just what you can see" is a genuinely useful debugging instinct.</p></div>
+      <div class="callout glass-inset"><span class="eyebrow">💡 Why this matters</span><p>"A value that looks right in every tool you check it with, but fails a strict parser" is common enough (trailing whitespace, wrong line endings, invisible Unicode) that "diff the raw bytes, not just what you can see" is a genuinely useful debugging instinct.</p></div>
     </section>
 
     <!-- ===================== CH 11 ===================== -->
-    <section class="chapter" id="ch11">
+    <section class="chapter glass" id="ch11">
       <div class="kicker">CHAPTER 11</div>
       <h2>Exercises</h2>
-      <div class="exercise"><div class="diff">⭐</div><div class="body"><strong>Change the free-delivery threshold</strong><p>Update <code class="inline">DEFAULT_SETTINGS.freeDeliveryThreshold</code> in <code class="inline">convex/lib.ts</code>.</p><div class="hint">Hint: trace where DEFAULT_SETTINGS is spread into publicSettings.</div></div></div>
-      <div class="exercise"><div class="diff">⭐</div><div class="body"><strong>Add a "Best Seller" badge</strong><p>Products already have <code class="inline">badges: string[]</code> — add the option to the admin form and render it.</p><div class="hint">Files: app/admin/products/page.tsx, app/page.tsx</div></div></div>
-      <div class="exercise"><div class="diff">⭐⭐</div><div class="body"><strong>Add a product field (e.g. <code class="inline">material</code>)</strong><p>Add it to schema.ts and productFields, then surface it in the admin form and product page.</p></div></div>
-      <div class="exercise"><div class="diff">⭐⭐</div><div class="body"><strong>Write a unit test for a new pricing rule</strong><p>Cap promo discounts at 50% in calcDiscount; add boundary tests at 49/50/51%.</p></div></div>
-      <div class="exercise"><div class="diff">⭐⭐⭐</div><div class="body"><strong>Add a new landing-page section type</strong><p>E.g. "video" — add the literal to the schema union in two places, add a component, wire the editor.</p></div></div>
-      <div class="exercise"><div class="diff">⭐⭐⭐</div><div class="body"><strong>Add a new order status</strong><p>E.g. "awaiting_stock" — decide whether it should fire a CAPI event or restock, like existing statuses do.</p></div></div>
-      <div class="exercise"><div class="diff">⭐⭐⭐</div><div class="body"><strong>Implement product search</strong><p>Add a search arg to products.list matching name/description; wire a search box on the homepage.</p></div></div>
-      <div class="exercise"><div class="diff">⭐⭐⭐⭐</div><div class="body"><strong>Add a "buy one get one cheapest free" promo type</strong><p>Redesign the Promo shape in lib/pricing.ts, thread cart line items into orders.place, write full test coverage including edge cases.</p></div></div>
-      <div class="exercise"><div class="diff">⭐⭐⭐⭐</div><div class="body"><strong>Add a low-stock admin alert</strong><p>Surface variants below a threshold after orders.place decrements stock — decide if that belongs in the mutation or a separate query.</p></div></div>
-      <div class="exercise"><div class="diff">⭐⭐⭐⭐</div><div class="body"><strong>Rate-limit orders.place</strong><p>Guard against fake-order spam — decide what to key on (phone? IP isn't easily visible to a mutation) and where counter state lives.</p></div></div>
+      <div class="exercise glass-inset"><div class="diff badge badge-info">⭐</div><div class="body"><strong>Change the free-delivery threshold</strong><p>Update <code class="inline">DEFAULT_SETTINGS.freeDeliveryThreshold</code> in <code class="inline">convex/lib.ts</code>.</p><div class="hint">Hint: trace where DEFAULT_SETTINGS is spread into publicSettings.</div></div></div>
+      <div class="exercise glass-inset"><div class="diff badge badge-info">⭐</div><div class="body"><strong>Add a "Best Seller" badge</strong><p>Products already have <code class="inline">badges: string[]</code> — add the option to the admin form and render it.</p><div class="hint">Files: app/admin/products/page.tsx, app/page.tsx</div></div></div>
+      <div class="exercise glass-inset"><div class="diff badge badge-info">⭐⭐</div><div class="body"><strong>Add a product field (e.g. <code class="inline">material</code>)</strong><p>Add it to schema.ts and productFields, then surface it in the admin form and product page.</p></div></div>
+      <div class="exercise glass-inset"><div class="diff badge badge-info">⭐⭐</div><div class="body"><strong>Write a unit test for a new pricing rule</strong><p>Cap promo discounts at 50% in calcDiscount; add boundary tests at 49/50/51%.</p></div></div>
+      <div class="exercise glass-inset"><div class="diff badge badge-info">⭐⭐⭐</div><div class="body"><strong>Add a new landing-page section type</strong><p>E.g. "video" — add the literal to the schema union in two places, add a component, wire the editor.</p></div></div>
+      <div class="exercise glass-inset"><div class="diff badge badge-info">⭐⭐⭐</div><div class="body"><strong>Add a new order status</strong><p>E.g. "awaiting_stock" — decide whether it should fire a CAPI event or restock, like existing statuses do.</p></div></div>
+      <div class="exercise glass-inset"><div class="diff badge badge-info">⭐⭐⭐</div><div class="body"><strong>Implement product search</strong><p>Add a search arg to products.list matching name/description; wire a search box on the homepage.</p></div></div>
+      <div class="exercise glass-inset"><div class="diff badge badge-info">⭐⭐⭐⭐</div><div class="body"><strong>Add a "buy one get one cheapest free" promo type</strong><p>Redesign the Promo shape in lib/pricing.ts, thread cart line items into orders.place, write full test coverage including edge cases.</p></div></div>
+      <div class="exercise glass-inset"><div class="diff badge badge-info">⭐⭐⭐⭐</div><div class="body"><strong>Add a low-stock admin alert</strong><p>Surface variants below a threshold after orders.place decrements stock — decide if that belongs in the mutation or a separate query.</p></div></div>
+      <div class="exercise glass-inset"><div class="diff badge badge-info">⭐⭐⭐⭐</div><div class="body"><strong>Rate-limit orders.place</strong><p>Guard against fake-order spam — decide what to key on (phone? IP isn't easily visible to a mutation) and where counter state lives.</p></div></div>
     </section>
 
     <!-- ===================== CH 12 ===================== -->
-    <section class="chapter" id="ch12">
+    <section class="chapter glass" id="ch12">
       <div class="kicker">CHAPTER 12</div>
       <h2>Glossary</h2>
       <dl class="glossary">

@@ -1,0 +1,246 @@
+/* ============================================================
+   Outfleek — Glass Design System
+   A restrained, standards-correct glassmorphism kit.
+   Used by: LAB-REPORT.html · tutorial.html · presentation/index.html
+   ============================================================ */
+
+:root{
+  /* --- base: deep neutral slate, NOT muddy purple --- */
+  --bg-0:#080B12;
+  --bg-1:#0B0F1A;
+
+  /* --- one accent family (indigo -> cyan). No rainbow. --- */
+  --accent:#7C9CFF;
+  --accent-2:#4ED8C4;
+  --accent-soft:rgba(124,156,255,.16);
+
+  /* --- semantic --- */
+  --ok:#4ADE80;
+  --warn:#FBBF24;
+  --bad:#F87171;
+
+  /* --- glass surfaces (3 depth tiers) --- */
+  --glass:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035)),rgba(10,14,24,.30);
+  --glass-raised:linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.05)),rgba(10,14,24,.26);
+  --glass-inset:rgba(4,7,14,.44);
+  --stroke:rgba(255,255,255,.10);
+  --stroke-strong:rgba(255,255,255,.16);
+
+  /* the two shadows that actually sell "glass":
+     an inset top highlight + a deep soft drop shadow */
+  --edge:inset 0 1px 0 rgba(255,255,255,.14);
+  --edge-strong:inset 0 1px 0 rgba(255,255,255,.22);
+  --drop:0 16px 40px rgba(0,0,0,.42);
+  --drop-lg:0 28px 70px rgba(0,0,0,.52);
+
+  /* --- text --- */
+  --ink:#EEF2F9;
+  --ink-2:rgba(238,242,249,.66);
+  --ink-3:rgba(238,242,249,.42);
+
+  --r-sm:10px; --r:16px; --r-lg:22px;
+
+  --sans:"Inter","Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono","SF Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--bg-1);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  line-height:1.65;
+}
+
+/* ---------- BACKDROP ----------
+   Discrete, well-separated, heavily blurred orbs on a deep base.
+   This gives backdrop-filter real structure to refract without
+   washing the foreground out. */
+.bg-field{
+  position:fixed; inset:0; z-index:-2; overflow:hidden;
+  background:
+    radial-gradient(1200px 800px at 15% -10%, #16204A 0%, transparent 60%),
+    radial-gradient(1000px 700px at 100% 0%,  #10303A 0%, transparent 55%),
+    linear-gradient(180deg,var(--bg-0),var(--bg-1) 40%,#070A11 100%);
+}
+.orb{
+  position:absolute; border-radius:50%;
+  filter:blur(110px);
+  opacity:.40;
+  will-change:transform;
+}
+.orb.a{width:46vw;height:46vw;left:-8vw;top:-10vw;   background:#3B5BDB; animation:drift1 34s ease-in-out infinite;}
+.orb.b{width:38vw;height:38vw;right:-6vw;top:8vh;    background:#0E7490; animation:drift2 40s ease-in-out infinite;}
+.orb.c{width:34vw;height:34vw;left:22vw;bottom:-14vw;background:#6D3BDB; opacity:.30; animation:drift3 46s ease-in-out infinite;}
+
+@keyframes drift1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(6vw,4vh,0) scale(1.12)}}
+@keyframes drift2{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-5vw,6vh,0) scale(1.08)}}
+@keyframes drift3{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(4vw,-5vh,0) scale(1.15)}}
+
+/* fine grain — the detail that stops glass looking like plastic */
+.bg-grain{
+  position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.032;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- GLASS SURFACES ---------- */
+.glass{
+  background:var(--glass);
+  -webkit-backdrop-filter:blur(26px) saturate(125%);
+  backdrop-filter:blur(26px) saturate(125%);
+  border:1px solid var(--stroke);
+  border-radius:var(--r-lg);
+  box-shadow:var(--edge),var(--drop);
+}
+.glass-raised{
+  background:var(--glass-raised);
+  -webkit-backdrop-filter:blur(32px) saturate(130%);
+  backdrop-filter:blur(32px) saturate(130%);
+  border:1px solid var(--stroke-strong);
+  border-radius:var(--r-lg);
+  box-shadow:var(--edge-strong),var(--drop-lg);
+}
+/* recessed wells (code blocks, tables) read as cut *into* the glass */
+.glass-inset{
+  background:var(--glass-inset);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--r);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.4);
+}
+
+/* ---------- TYPE ---------- */
+h1,h2,h3,h4,h5{
+  font-family:var(--sans);
+  font-weight:650;
+  letter-spacing:-.021em;
+  line-height:1.18;
+  color:var(--ink);
+  margin:0 0 .5em;
+  text-wrap:balance;
+}
+h1{font-size:clamp(2rem,4.4vw,3.1rem);font-weight:700;letter-spacing:-.031em}
+h2{font-size:clamp(1.45rem,2.5vw,2rem)}
+h3{font-size:1.22rem}
+h4{font-size:1.04rem}
+p{margin:0 0 1.05em;color:var(--ink-2)}
+strong,b{color:var(--ink);font-weight:620}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(124,156,255,.32)}
+a:hover{border-bottom-color:var(--accent)}
+
+.eyebrow{
+  font-size:.7rem;font-weight:640;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 .7em;
+}
+.lede{font-size:1.09rem;color:var(--ink-2);max-width:68ch}
+
+/* ---------- CODE ---------- */
+code{
+  font-family:var(--mono);font-size:.875em;
+  font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.08);
+  padding:.12em .4em;border-radius:6px;color:#CFE0FF;
+}
+pre{
+  font-family:var(--mono);font-size:.845rem;line-height:1.62;
+  font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0;
+  margin:0;padding:18px 20px;overflow-x:auto;   /* never overflow the card */
+  background:var(--glass-inset);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--r);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.4);
+  color:#D6E2F5;max-width:100%;
+}
+pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
+pre::-webkit-scrollbar{height:9px}
+pre::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:9px}
+
+/* code token colours (manual spans) */
+.tk-key{color:#C3A6FF}.tk-str{color:#8FE3B0}.tk-num{color:#FFC98C}
+.tk-com{color:rgba(238,242,249,.34);font-style:italic}.tk-fn{color:#7FC9FF}
+
+/* ---------- PILLS / BADGES ---------- */
+.pill{
+  display:inline-flex;align-items:center;gap:.45em;
+  padding:.42em .85em;border-radius:999px;
+  background:var(--glass-raised);
+  border:1px solid var(--stroke);
+  box-shadow:var(--edge);
+  font-size:.8rem;color:var(--ink-2);white-space:nowrap;
+}
+.badge{
+  display:inline-flex;align-items:center;gap:.4em;
+  padding:.3em .72em;border-radius:999px;
+  font-size:.735rem;font-weight:640;letter-spacing:.045em;text-transform:uppercase;
+  border:1px solid transparent;
+}
+.badge-pass{background:rgba(74,222,128,.13);border-color:rgba(74,222,128,.34);color:#8FF0B4}
+.badge-warn{background:rgba(251,191,36,.13);border-color:rgba(251,191,36,.34);color:#FFD98A}
+.badge-fail{background:rgba(248,113,113,.13);border-color:rgba(248,113,113,.34);color:#FFA9A9}
+.badge-info{background:var(--accent-soft);border-color:rgba(124,156,255,.34);color:#B9CCFF}
+
+/* ---------- TABLES ---------- */
+.tbl-wrap{overflow-x:auto;border-radius:var(--r);}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+thead th{
+  text-align:left;padding:11px 14px;
+  background:rgba(255,255,255,.055);
+  border-bottom:1px solid var(--stroke-strong);
+  font-weight:620;font-size:.76rem;letter-spacing:.075em;text-transform:uppercase;color:var(--ink-2);
+  white-space:nowrap;
+}
+tbody td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.055);color:var(--ink-2);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:rgba(255,255,255,.032)}
+
+/* ---------- FIGURES ---------- */
+.figure{margin:1.6em 0}
+.figure .frame{
+  background:var(--glass-inset);
+  border:1px solid var(--stroke);
+  border-radius:var(--r);
+  padding:10px;box-shadow:var(--edge),0 10px 30px rgba(0,0,0,.35);
+  overflow:hidden;
+}
+.figure img{display:block;width:100%;height:auto;border-radius:10px}
+.figcap{margin-top:.7em;font-size:.83rem;color:var(--ink-3);text-align:center}
+
+/* ---------- SCROLL REVEAL ---------- */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .62s cubic-bezier(.22,.7,.3,1),transform .62s cubic-bezier(.22,.7,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- PROGRESS ---------- */
+.progress{
+  position:fixed;top:0;left:0;height:2px;z-index:100;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  box-shadow:0 0 12px rgba(124,156,255,.55);width:0;
+}
+
+/* ---------- SCROLLBAR ---------- */
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.13);border-radius:9px;border:3px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.22);background-clip:content-box}
+
+::selection{background:rgba(124,156,255,.32);color:#fff}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+}
+
+/* Neutral glass — for nav rails and chrome that must not pick up orb colour */
+.glass-neutral{
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.028)),rgba(8,11,19,.55);
+  -webkit-backdrop-filter:blur(28px) saturate(105%);
+  backdrop-filter:blur(28px) saturate(105%);
+  border:1px solid var(--stroke);
+  border-radius:var(--r-lg);
+  box-shadow:var(--edge),var(--drop);
+}
