@@ -9,6 +9,15 @@ const ADMIN_PASSWORD = "luxe-admin-2026";
 
 let orderNo = null;
 
+async function closeDrawerIfOpen(p) {
+  const closeBtn = p.locator('aside[aria-label="Shopping cart"] button[aria-label="Close"]');
+  if (await closeBtn.isVisible().catch(() => false)) {
+    await closeBtn.click();
+    await p.waitForTimeout(500);
+  }
+}
+
+
 async function shot(name, fn) {
   try {
     await fn();
@@ -67,12 +76,23 @@ async function settle(page, selector, timeout = 15000) {
     await page.waitForSelector('aside[aria-label="Shopping cart"]', { timeout: 10000 });
     await page.waitForTimeout(1500);
     await page.screenshot({ path: path.join(OUT, "04-cart-drawer.png") });
+    // drawerOpen persists to localStorage; close it so it doesn't block subsequent steps
+    const closeBtn = page.locator('aside[aria-label="Shopping cart"] button[aria-label="Close"]');
+    if (await closeBtn.isVisible().catch(() => false)) {
+      await closeBtn.click();
+      await page.waitForTimeout(500);
+    }
   });
 
   // add a second item then go to cart page
   await shot("05-cart-page.png", async () => {
     await page.goto(BASE + "/", { waitUntil: "domcontentloaded" });
     await settle(page, "main article");
+    const preClose = page.locator('aside[aria-label="Shopping cart"] button[aria-label="Close"]');
+    if (await preClose.isVisible().catch(() => false)) {
+      await preClose.click();
+      await page.waitForTimeout(500);
+    }
     const cards = page.locator("main article");
     const count = await cards.count();
     for (let i = 0; i < Math.min(2, count); i++) {
@@ -98,6 +118,7 @@ async function settle(page, selector, timeout = 15000) {
   await shot("06-checkout-form.png", async () => {
     await page.goto(BASE + "/checkout", { waitUntil: "domcontentloaded" });
     await settle(page, "main");
+    await closeDrawerIfOpen(page);
     await page.screenshot({ path: path.join(OUT, "06-checkout-form.png"), fullPage: true });
   });
 
@@ -105,6 +126,7 @@ async function settle(page, selector, timeout = 15000) {
   await shot("07-checkout-validation-error.png", async () => {
     await page.goto(BASE + "/checkout", { waitUntil: "domcontentloaded" });
     await settle(page, "main");
+    await closeDrawerIfOpen(page);
     const phoneInput = page.getByPlaceholder("01XXXXXXXXX").first();
     await phoneInput.fill("01123456789");
     await phoneInput.blur();
@@ -116,6 +138,7 @@ async function settle(page, selector, timeout = 15000) {
   await shot("08-checkout-bkash.png", async () => {
     await page.goto(BASE + "/checkout", { waitUntil: "domcontentloaded" });
     await settle(page, "main");
+    await closeDrawerIfOpen(page);
     await page.getByRole("button", { name: /bKash/ }).click();
     await page.waitForSelector('input[placeholder="e.g. 9H7XXXXXXX"]', { timeout: 10000 });
     await page.waitForTimeout(1000);
@@ -126,6 +149,7 @@ async function settle(page, selector, timeout = 15000) {
   await shot("09-order-success.png", async () => {
     await page.goto(BASE + "/checkout", { waitUntil: "domcontentloaded" });
     await settle(page, "main");
+    await closeDrawerIfOpen(page);
     await page.getByPlaceholder("Your name").fill("Test Student");
     await page.getByPlaceholder("01XXXXXXXXX").first().fill("01712345678");
     await page.getByPlaceholder("House, road, area, district").fill("House 1, Road 2, Dhanmondi, Dhaka");
@@ -162,8 +186,8 @@ async function settle(page, selector, timeout = 15000) {
   // 12 landing order form
   await shot("12-landing-order-form.png", async () => {
     await page.goto(BASE + "/l/noir-bloom-offer", { waitUntil: "domcontentloaded" });
-    await settle(page, "body");
-    await page.locator("#order").scrollIntoViewIfNeeded();
+    await settle(page, "#order", 20000);
+    await page.locator("#order").scrollIntoViewIfNeeded({ timeout: 20000 });
     await page.waitForTimeout(1500);
     await page.screenshot({ path: path.join(OUT, "12-landing-order-form.png") });
   });

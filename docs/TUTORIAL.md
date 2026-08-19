@@ -1115,30 +1115,51 @@ environment variable, set in Vercel's project settings for production
 | `ADMIN_PASSWORD` | `npx convex env set` (per deployment) | Read server-side only, in `convex/auth.ts` — never shipped to the browser |
 | `pixelId`, `capiToken`, `testEventCode` | Convex `settings` table, edited from `/admin/settings` | Runtime-configurable without a redeploy; `capiToken` is explicitly stripped out of `publicSettings` (Chapter 8) before it ever reaches the client |
 
-### A real class of deploy bug worth knowing about: invisible characters in env vars
+### A real deploy bug from this project: an invisible byte in an env var
 
-A classic, easy-to-lose-an-hour-to bug on Windows: PowerShell's default text
-encoding for redirected output can prepend a **UTF-8 BOM** (a few invisible
-bytes at the very start of a file/string) when you write an environment
-variable value through certain PowerShell commands (e.g. `Out-File`,
-`Set-Content` without `-Encoding utf8` explicitly, or piping through
-`>`/`>>` in some configurations). If that happens to a value like
-`NEXT_PUBLIC_CONVEX_URL`, the string looks *visually* identical to the real
-URL in your editor — but it now starts with an invisible character. Convex's
-client-side URL parsing rejects it outright, and the error message
-(`Invalid URL` or a similarly generic failure) gives you no hint that the
-problem is an invisible byte, not a wrong value.
+This actually happened while deploying Outfleek, and it is worth studying
+because the symptom points nowhere near the cause.
 
-The fix once you know to look for it: re-copy the value using a method that
-doesn't add a BOM (Convex's own `npx convex dev` writing `.env.local`
-directly is BOM-safe; hand-editing through certain Windows tools is the risk
-factor), or strip it programmatically (`content.replace(/^﻿/, '')`).
+The production Convex URL was added to Vercel from a PowerShell pipeline:
 
-💡 **Why this matters**: this class of bug (a value that "looks right" in
-every tool you check it with, but fails a strict parser) is common enough
-across many platforms — trailing whitespace, invisible Unicode, wrong line
-endings — that "diff the raw bytes, not just what you can see" is a genuinely
-useful debugging instinct to build early.
+```powershell
+"https://reliable-opossum-818.convex.cloud" | npx vercel env add NEXT_PUBLIC_CONVEX_URL production
+```
+
+The deploy succeeded. The build succeeded. Then every page on the live site
+died instantly with a blank screen and this console error:
+
+```
+Uncaught Error: Invalid deployment address: Must start with "https://" or "http://".
+Found "﻿https://reliable-opossum-818.convex.cloud".
+```
+
+Look closely at the value in the error: it *does* start with `https://`. The
+error looks like a lie. But immediately before the `h` there is `﻿` — a
+**UTF-8 byte order mark (BOM)**, an invisible character that PowerShell
+prepended when it piped the string. Convex's URL validation compares the
+first characters strictly, the BOM is not `h`, so the check fails.
+
+The value looked correct in the Vercel dashboard, in the terminal, and in an
+editor — because a BOM renders as nothing at all.
+
+The fix was to delete the variable and re-add it from a shell that does not
+add a BOM:
+
+```bash
+vercel env rm NEXT_PUBLIC_CONVEX_URL production --yes
+printf 'https://reliable-opossum-818.convex.cloud' | vercel env add NEXT_PUBLIC_CONVEX_URL production
+```
+
+then redeploy. (`printf` in bash emits exactly the bytes you give it; the
+PowerShell pipeline did not.)
+
+💡 **Why this matters**: the lesson is not "PowerShell is bad" — it is that
+when an error message describes something that looks impossible, suspect the
+bytes you cannot see. Trailing whitespace, invisible Unicode, and wrong line
+endings all produce this same "but it looks right!" class of bug on every
+platform. Build the instinct early: when a value fails a strict parser,
+inspect its raw bytes rather than its rendering.
 
 ---
 

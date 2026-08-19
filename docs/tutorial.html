@@ -1,0 +1,789 @@
+<title>Outfleek Tutorial</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg-0: #0b0a1a;
+    --bg-1: #120f28;
+    --ink: #eae7fb;
+    --ink-dim: #b7b2d9;
+    --ink-faint: #837da8;
+    --accent: #a78bfa;
+    --accent-2: #6ee7d4;
+    --accent-3: #f0a8d0;
+    --glass-bg: rgba(255, 255, 255, 0.055);
+    --glass-bg-strong: rgba(255, 255, 255, 0.09);
+    --glass-border: rgba(255, 255, 255, 0.14);
+    --code-bg: rgba(8, 7, 20, 0.55);
+    --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    --serif: "Fraunces", Georgia, "Times New Roman", serif;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg-0);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+
+  /* ---------- ambient background blobs ---------- */
+  .blobs { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.55;
+    will-change: transform;
+  }
+  .blob.b1 { width: 46vw; height: 46vw; top: -10%; left: -8%; background: radial-gradient(circle, #6d4fc7, transparent 70%); animation: float1 26s ease-in-out infinite; }
+  .blob.b2 { width: 40vw; height: 40vw; top: 30%; right: -12%; background: radial-gradient(circle, #2fb8a8, transparent 70%); animation: float2 32s ease-in-out infinite; }
+  .blob.b3 { width: 38vw; height: 38vw; bottom: -14%; left: 20%; background: radial-gradient(circle, #c25fa0, transparent 70%); animation: float3 29s ease-in-out infinite; }
+  @keyframes float1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(6vw, 8vh) scale(1.12); } }
+  @keyframes float2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-7vw, -5vh) scale(0.92); } }
+  @keyframes float3 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(4vw, -7vh) scale(1.08); } }
+
+  /* ---------- progress bar ---------- */
+  #progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+    background: linear-gradient(90deg, var(--accent-2), var(--accent), var(--accent-3));
+    z-index: 100; transition: width 0.08s linear;
+    box-shadow: 0 0 12px rgba(167,139,250,0.7);
+  }
+
+  /* ---------- layout ---------- */
+  .shell {
+    position: relative; z-index: 1;
+    max-width: 1280px; margin: 0 auto;
+    display: grid; grid-template-columns: 260px minmax(0,1fr);
+    gap: 40px;
+    padding: 40px 24px 120px;
+  }
+  @media (max-width: 920px) {
+    .shell { grid-template-columns: 1fr; padding-top: 84px; }
+  }
+
+  /* ---------- sidebar ---------- */
+  .sidebar {
+    position: sticky; top: 24px; align-self: start;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border-radius: 18px;
+    padding: 22px 18px;
+    box-shadow: var(--shadow);
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+  }
+  @media (max-width: 920px) {
+    .sidebar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
+      max-height: 60px; overflow: hidden; border-radius: 0;
+      transition: max-height 0.3s ease;
+      padding: 12px 16px;
+    }
+    .sidebar.open { max-height: 80vh; overflow-y: auto; }
+  }
+  .sidebar-brand {
+    font-family: var(--serif); font-size: 1.15rem; letter-spacing: 0.01em;
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--ink); margin-bottom: 14px;
+  }
+  .sidebar-brand small { display:block; font-family: var(--sans); font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-2); margin-top: 2px; }
+  #navToggle {
+    display: none; background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
+    color: var(--ink); border-radius: 8px; padding: 6px 10px; font-size: 0.8rem; cursor: pointer;
+  }
+  @media (max-width: 920px) { #navToggle { display: inline-block; } }
+  .navlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .navlist a {
+    display: block; padding: 7px 10px; border-radius: 9px;
+    color: var(--ink-dim); text-decoration: none; font-size: 0.85rem;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    border: 1px solid transparent;
+  }
+  .navlist a:hover { color: var(--ink); background: var(--glass-bg-strong); }
+  .navlist a.active {
+    color: var(--bg-0); background: linear-gradient(120deg, var(--accent-2), var(--accent));
+    font-weight: 600; border-color: transparent;
+  }
+
+  /* ---------- main content ---------- */
+  main { min-width: 0; }
+
+  .hero {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border-radius: 24px;
+    padding: 48px 40px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+  }
+  .hero .eyebrow {
+    font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--accent-2); margin-bottom: 14px; font-weight: 600;
+  }
+  .hero h1 {
+    font-family: var(--serif); font-weight: 600; font-size: clamp(2rem, 4.4vw, 3.2rem);
+    margin: 0 0 14px; line-height: 1.08; text-wrap: balance;
+    background: linear-gradient(120deg, #fff, var(--accent-2) 60%, var(--accent));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p.lead { font-size: 1.05rem; color: var(--ink-dim); max-width: 62ch; margin: 0 0 18px; }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .pill {
+    font-size: 0.72rem; padding: 6px 14px; border-radius: 999px;
+    background: var(--glass-bg-strong); border: 1px solid var(--glass-border);
+    color: var(--ink-dim); letter-spacing: 0.04em;
+  }
+
+  section.chapter {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border-radius: 22px;
+    padding: 38px 40px;
+    margin-bottom: 26px;
+    box-shadow: var(--shadow);
+    opacity: 0; transform: translateY(28px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  section.chapter.revealed { opacity: 1; transform: translateY(0); }
+  @media (max-width: 620px) { section.chapter, .hero { padding: 28px 20px; } }
+
+  .chapter .kicker {
+    font-family: var(--mono); font-size: 0.72rem; color: var(--accent-3);
+    letter-spacing: 0.08em; margin-bottom: 6px;
+  }
+  section.chapter h2 {
+    font-family: var(--serif); font-weight: 600; font-size: clamp(1.5rem, 2.6vw, 2.05rem);
+    margin: 0 0 18px; text-wrap: balance; color: #fff;
+  }
+  section.chapter h3 {
+    font-family: var(--serif); font-weight: 600; font-size: 1.25rem;
+    margin: 30px 0 12px; color: var(--accent-2);
+  }
+  section.chapter p { color: var(--ink-dim); max-width: 74ch; margin: 0 0 16px; }
+  section.chapter p strong, section.chapter li strong { color: var(--ink); }
+  section.chapter ul, section.chapter ol { color: var(--ink-dim); padding-left: 22px; margin: 0 0 16px; }
+  section.chapter li { margin-bottom: 8px; max-width: 72ch; }
+  section.chapter a { color: var(--accent-2); text-decoration: underline; text-decoration-color: rgba(110,231,212,0.4); text-underline-offset: 3px; }
+  section.chapter a:hover { text-decoration-color: var(--accent-2); }
+
+  /* callout */
+  .callout {
+    margin: 22px 0 6px; padding: 16px 20px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(167,139,250,0.14), rgba(110,231,212,0.09));
+    border: 1px solid rgba(167,139,250,0.35);
+  }
+  .callout strong { color: var(--accent-2); }
+  .callout p { margin: 6px 0 0; color: var(--ink); }
+
+  /* tables */
+  .tablewrap { overflow-x: auto; margin: 16px 0 22px; border-radius: 12px; border: 1px solid var(--glass-border); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; min-width: 480px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--glass-border); color: var(--ink-dim); }
+  th { color: var(--accent-2); font-weight: 600; background: rgba(255,255,255,0.03); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  tr:last-child td { border-bottom: none; }
+  td strong, td code { color: var(--ink); }
+
+  /* code blocks */
+  .codeblock {
+    position: relative; margin: 16px 0 20px;
+    background: var(--code-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .codeblock .code-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 14px; font-family: var(--mono); font-size: 0.7rem;
+    color: var(--ink-faint); border-bottom: 1px solid var(--glass-border);
+    background: rgba(255,255,255,0.02);
+  }
+  .codeblock pre {
+    margin: 0; padding: 16px 18px; overflow-x: auto;
+    font-family: var(--mono); font-size: 0.82rem; line-height: 1.6;
+    color: #d8d4f5;
+  }
+  .codeblock code .tok-kw { color: #f0a8d0; }
+  .codeblock code .tok-str { color: #9be3a0; }
+  .codeblock code .tok-com { color: #7c76a0; font-style: italic; }
+  .codeblock code .tok-fn { color: #6ee7d4; }
+  .codeblock code .tok-num { color: #ffcb87; }
+  .copy-btn {
+    font-family: var(--sans); font-size: 0.7rem; letter-spacing: 0.04em;
+    background: var(--glass-bg-strong); color: var(--ink-dim);
+    border: 1px solid var(--glass-border); border-radius: 7px;
+    padding: 4px 10px; cursor: pointer; transition: all 0.15s ease;
+  }
+  .copy-btn:hover { color: #fff; border-color: var(--accent-2); }
+  .copy-btn.copied { color: var(--bg-0); background: var(--accent-2); border-color: var(--accent-2); }
+  code.inline { font-family: var(--mono); font-size: 0.86em; background: rgba(255,255,255,0.08); padding: 1px 6px; border-radius: 5px; color: var(--accent-2); }
+
+  pre.diagram {
+    font-family: var(--mono); font-size: 0.76rem; line-height: 1.5;
+    background: var(--code-bg); border: 1px solid var(--glass-border); border-radius: 14px;
+    padding: 20px; overflow-x: auto; color: var(--ink-dim); margin: 16px 0 22px;
+  }
+
+  .exercise {
+    display: flex; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--glass-border);
+  }
+  .exercise:last-child { border-bottom: none; }
+  .exercise .diff { font-family: var(--mono); font-size: 0.85rem; color: var(--accent-3); flex-shrink: 0; width: 68px; }
+  .exercise .body strong { display: block; color: var(--ink); margin-bottom: 4px; }
+  .exercise .body p { margin: 0 0 4px; font-size: 0.92rem; }
+  .exercise .hint { font-size: 0.82rem; color: var(--ink-faint); font-style: italic; }
+
+  dl.glossary { display: grid; gap: 14px; }
+  dl.glossary dt { font-family: var(--mono); color: var(--accent-2); font-size: 0.92rem; margin-bottom: 3px; }
+  dl.glossary dd { margin: 0; color: var(--ink-dim); font-size: 0.92rem; max-width: 70ch; }
+
+  footer.end {
+    text-align: center; color: var(--ink-faint); font-size: 0.8rem;
+    padding: 30px 0 10px; position: relative; z-index: 1;
+  }
+  footer.end a { color: var(--accent-2); }
+</style>
+
+<div class="blobs">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+</div>
+<div id="progress"></div>
+
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div>Outfleek<small>Learning Tutorial</small></div>
+      <button id="navToggle" aria-label="Toggle navigation">☰</button>
+    </div>
+    <ul class="navlist" id="navlist">
+      <li><a href="#ch0">0 · Getting Started</a></li>
+      <li><a href="#ch1">1 · The Big Picture</a></li>
+      <li><a href="#ch2">2 · App Router</a></li>
+      <li><a href="#ch3">3 · Convex Backend</a></li>
+      <li><a href="#ch4">4 · Client State</a></li>
+      <li><a href="#ch5">5 · Framer Motion</a></li>
+      <li><a href="#ch6">6 · Payments & BD</a></li>
+      <li><a href="#ch7">7 · Landing Pages</a></li>
+      <li><a href="#ch8">8 · Pixel + CAPI</a></li>
+      <li><a href="#ch9">9 · Testing</a></li>
+      <li><a href="#ch10">10 · Deployment</a></li>
+      <li><a href="#ch11">11 · Exercises</a></li>
+      <li><a href="#ch12">12 · Glossary</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="hero">
+      <div class="eyebrow">Learn a real production app</div>
+      <h1>The Outfleek Tutorial</h1>
+      <p class="lead">
+        A guided walkthrough of a real, deployed Next.js 15 + Convex + Framer Motion
+        e‑commerce platform built for Bangladesh — Cash on Delivery, manual bKash,
+        a Facebook‑ad landing‑page builder, and correct Meta Pixel + Conversions API
+        tracking. Read it side‑by‑side with the actual code.
+      </p>
+      <div class="hero-meta">
+        <span class="pill">Next.js 15 · App Router</span>
+        <span class="pill">Convex</span>
+        <span class="pill">Framer Motion</span>
+        <span class="pill">Zustand</span>
+        <span class="pill">Vitest</span>
+        <span class="pill">Live: outfleek.vercel.app</span>
+      </div>
+    </div>
+
+    <!-- ===================== CH 0 ===================== -->
+    <section class="chapter" id="ch0">
+      <div class="kicker">CHAPTER 0</div>
+      <h2>Getting the project running</h2>
+      <p>Four commands, in order, get you from a clone to a running store.</p>
+      <div class="codeblock">
+        <div class="code-head"><span>bash</span><button class="copy-btn">Copy</button></div>
+        <pre><code>git clone https://github.com/vampxlr/outfleek.git
+cd outfleek
+npm install
+
+<span class="tok-com"># 1. Create your own Convex backend — writes .env.local for you</span>
+npx convex dev            <span class="tok-com"># leave running, terminal 1</span>
+
+<span class="tok-com"># 2. Seed sample products/categories, in a second terminal</span>
+npx convex run seed:run
+
+<span class="tok-com"># 3. Set an admin password (a Convex env var, never in code)</span>
+npx convex env set ADMIN_PASSWORD your-password-here
+
+<span class="tok-com"># 4. Start the Next.js dev server</span>
+npm run dev               <span class="tok-com"># -> http://localhost:3000</span></code></pre>
+      </div>
+      <p>Visit <code class="inline">/</code> for the store and <code class="inline">/admin</code> to log in with the password from step 3.</p>
+      <p>By the end of this tutorial you'll be able to: explain the app's three surfaces, read <code class="inline">convex/schema.ts</code> and know what an index does, trace an order end-to-end including its Meta tracking event, explain why prices are never trusted from the browser, name Framer Motion's core animation props, explain event deduplication well enough to teach it, write a unit test for a pricing rule, and make safe, deliberate changes to the codebase.</p>
+      <div class="callout"><strong>💡 Why this matters —</strong><p><code class="inline">npx convex dev</code> isn't background noise: it's a live connection that also pushes your backend code on every save. Without it, nothing works — not even locally.</p></div>
+    </section>
+
+    <!-- ===================== CH 1 ===================== -->
+    <section class="chapter" id="ch1">
+      <div class="kicker">CHAPTER 1</div>
+      <h2>The big picture</h2>
+      <p>Outfleek isn't one app — it's <strong>three surfaces</strong> sharing one backend:</p>
+      <div class="tablewrap"><table>
+        <tr><th>Surface</th><th>Route</th><th>Audience</th><th>Purpose</th></tr>
+        <tr><td>Storefront</td><td><code class="inline">/</code>, <code class="inline">/product/[slug]</code>, <code class="inline">/checkout</code></td><td>Shoppers</td><td>Browse, cart, pay COD/bKash, track order</td></tr>
+        <tr><td>Admin panel</td><td><code class="inline">/admin/*</code></td><td>Store owner</td><td>Products, orders, settings, tracking</td></tr>
+        <tr><td>Landing pages</td><td><code class="inline">/l/[slug]</code></td><td>Facebook ad traffic</td><td>One product, one page, one form</td></tr>
+      </table></div>
+      <pre class="diagram">┌──────────────┐      ┌──────────────┐      ┌───────────────────┐
+│   Browser    │◄────►│   Next.js    │◄────►│      Convex        │
+│ store/admin/ │ HTTP │  App Router  │ WS/  │  (DB + functions   │
+│  landing pg  │      │  (React 19)  │ RPC  │   + scheduler)     │
+└──────────────┘      └──────────────┘      └─────────┬──────────┘
+                                                       │ scheduled action
+                                                       ▼
+                                             ┌───────────────────┐
+                                             │   Meta Graph API    │
+                                             │ (Conversions API)   │
+                                             └───────────────────┘</pre>
+      <h3>Why Convex instead of REST + Postgres?</h3>
+      <p>A traditional stack needs an ORM, a database, hand-wired websockets for the live admin dashboard, and a separate job queue (Redis + BullMQ) for retrying failed Meta calls — four moving pieces. Convex collapses all of it: <strong>reactivity</strong> is built into every <code class="inline">useQuery</code>, the <strong>scheduler</strong> replaces the job queue (<code class="inline">ctx.scheduler.runAfter</code>), <strong>file storage</strong> is built in for product photos, and there's <strong>no ORM or migrations</strong> — <code class="inline">schema.ts</code> is the schema.</p>
+      <div class="callout"><strong>💡 Why this matters —</strong><p>For a small team shipping a COD store, every piece of infrastructure you don't have to run is one less thing that can go down at 11pm mid-order.</p></div>
+    </section>
+
+    <!-- ===================== CH 2 ===================== -->
+    <section class="chapter" id="ch2">
+      <div class="kicker">CHAPTER 2</div>
+      <h2>Next.js App Router basics as used here</h2>
+      <p>Folders under <code class="inline">app/</code> become routes. <code class="inline">[slug]</code> is a <strong>dynamic segment</strong> — <code class="inline">app/product/[slug]/page.tsx</code> renders for any product slug, reading <code class="inline">params.slug</code> and asking Convex for that one product.</p>
+      <div class="codeblock">
+        <div class="code-head"><span>app/ (excerpt)</span><button class="copy-btn">Copy</button></div>
+        <pre><code>app/page.tsx                  -&gt;  /            (home = product listing)
+app/layout.tsx                    (wraps every page)
+app/providers.tsx                 (client-side context)
+app/product/[slug]/page.tsx   -&gt;  /product/essential-black-tee
+app/l/[slug]/page.tsx         -&gt;  /l/eid-premium-black   (landing pages)
+app/admin/orders/page.tsx     -&gt;  /admin/orders
+app/(policies)/privacy/page.tsx -&gt; /privacy   (parens = not in the URL)</code></pre>
+      </div>
+      <h3>Server vs. client components — and why almost every page here is "use client"</h3>
+      <p>By default App Router components are <strong>Server Components</strong>: rendered on the server, zero JS shipped for their own logic, no <code class="inline">useState</code>/browser APIs. Adding <code class="inline">"use client"</code> at the top opts a component (and its subtree) into the browser.</p>
+      <p>Nearly every page here starts with it, because the app is built around <strong>live Convex queries</strong>, <strong>browser state</strong> (the Zustand cart), and <strong>browser-only tracking</strong> (pixel, cookies) — none of which a server component can do.</p>
+      <div class="codeblock">
+        <div class="code-head"><span>app/providers.tsx</span><button class="copy-btn">Copy</button></div>
+        <pre><code><span class="tok-kw">export function</span> <span class="tok-fn">Providers</span>({ children }: { children: ReactNode }) {
+  <span class="tok-kw">const</span> client = useMemo(
+    () =&gt; <span class="tok-kw">new</span> ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL <span class="tok-kw">as</span> <span class="tok-kw">string</span>),
+    []
+  );
+  <span class="tok-kw">return</span> (
+    &lt;ConvexProvider client={client}&gt;
+      &lt;Tracking&gt;{children}&lt;/Tracking&gt;
+    &lt;/ConvexProvider&gt;
+  );
+}</code></pre>
+      </div>
+      <p><code class="inline">app/layout.tsx</code> stays a server component (sets <code class="inline">&lt;html&gt;</code>/metadata for SEO) and wraps everything in <code class="inline">&lt;Providers&gt;</code>, which creates <strong>one</strong> <code class="inline">ConvexReactClient</code> for the whole tree and fires a Pixel <code class="inline">PageView</code> on every route change.</p>
+      <div class="callout"><strong>💡 Why this matters —</strong><p><code class="inline">"use client"</code> is a trade-off, not a style rule: this app trades server rendering for "always-live everywhere," which is the right call for a fast-moving small catalog.</p></div>
+    </section>
+
+    <!-- ===================== CH 3 ===================== -->
+    <section class="chapter" id="ch3">
+      <div class="kicker">CHAPTER 3</div>
+      <h2>Convex: the backend</h2>
+      <div class="tablewrap"><table>
+        <tr><th>Block</th><th>What it is</th><th>Example</th></tr>
+        <tr><td>schema</td><td>Declares tables, types, indexes</td><td><code class="inline">convex/schema.ts</code></td></tr>
+        <tr><td>query</td><td>Reactive read; auto re-runs on the client</td><td><code class="inline">products.list</code></td></tr>
+        <tr><td>mutation</td><td>Transactional write, all-or-nothing</td><td><code class="inline">orders.place</code></td></tr>
+        <tr><td>action</td><td>Can call the outside world; not transactional</td><td><code class="inline">capi.sendEvent</code></td></tr>
+        <tr><td>scheduler</td><td>Queues a mutation/action to run later, outside the current transaction</td><td><code class="inline">ctx.scheduler.runAfter(0, …)</code></td></tr>
+      </table></div>
+
+      <h3>Reading the schema: why indexes exist</h3>
+      <div class="codeblock">
+        <div class="code-head"><span>convex/schema.ts</span><button class="copy-btn">Copy</button></div>
+        <pre><code>products: defineTable({
+  name: v.string(), slug: v.string(), price: v.number(),
+  variants: v.array(variant),  <span class="tok-com">// { size, color, stock } — embedded, not a join table</span>
+  active: v.boolean(),
+  <span class="tok-com">/* … */</span>
+}).index(<span class="tok-str">"by_slug"</span>, [<span class="tok-str">"slug"</span>]).index(<span class="tok-str">"by_active"</span>, [<span class="tok-str">"active"</span>]),</code></pre>
+      </div>
+      <p>Without <code class="inline">by_slug</code>, looking up a product by its URL slug scans every row. <code class="inline">by_active</code> exists because the storefront always filters to live products only — indexing that boolean turns it into a fast index scan.</p>
+      <p><code class="inline">orders</code> deliberately <strong>denormalizes</strong>: each order's <code class="inline">items</code> snapshot the product's <code class="inline">name</code> and <code class="inline">price</code> at purchase time, so a later price change never rewrites history on an old invoice.</p>
+
+      <h3><code class="inline">orders.place</code> — the most important function in the codebase</h3>
+      <p>One mutation, seven steps: validate phone/cart → resolve landing page → loop cart items, check + decrement stock, price server-side → apply promo → compute delivery fee → insert order + mark abandoned-checkout converted → schedule the Meta Purchase event.</p>
+      <div class="codeblock">
+        <div class="code-head"><span>convex/orders.ts (excerpt)</span><button class="copy-btn">Copy</button></div>
+        <pre><code><span class="tok-kw">for</span> (<span class="tok-kw">const</span> it <span class="tok-kw">of</span> args.items) {
+  <span class="tok-kw">const</span> p = <span class="tok-kw">await</span> ctx.db.get(it.productId);
+  <span class="tok-kw">if</span> (!p || !p.active) <span class="tok-kw">throw new</span> Error(<span class="tok-str">"Product unavailable"</span>);
+  <span class="tok-kw">const</span> vi = p.variants.findIndex(x =&gt; x.size === it.size);
+  <span class="tok-kw">if</span> (p.variants[vi].stock &lt; it.qty) <span class="tok-kw">throw new</span> Error(<span class="tok-str">"Out of stock"</span>);
+  <span class="tok-kw">const</span> variants = [...p.variants];
+  variants[vi] = { ...variants[vi], stock: variants[vi].stock - it.qty };
+  <span class="tok-kw">await</span> ctx.db.patch(p._id, { variants });
+
+  <span class="tok-kw">const</span> unit = landing?.priceOverride ?? p.price;  <span class="tok-com">// price comes from the DB — never from the client</span>
+  subtotal += unit * it.qty;
+}
+<span class="tok-com">// … insert order, then:</span>
+<span class="tok-kw">await</span> ctx.scheduler.runAfter(<span class="tok-num">0</span>, internal.capi.sendEvent, {
+  eventName: <span class="tok-str">"Purchase"</span>, eventId: args.tracking?.eventId ?? no, <span class="tok-com">/* … */</span>
+});</code></pre>
+      </div>
+      <p><em>See <a href="https://github.com/vampxlr/outfleek/blob/main/convex/orders.ts" target="_blank" rel="noopener">the full function in the repo</a> for promo and delivery-fee handling.</em></p>
+      <p><strong>Why one mutation?</strong> A Convex mutation is <strong>atomic</strong> — every write inside it commits together or not at all. Two customers buying the last unit at once is handled correctly for free: whoever's mutation runs second sees the decremented stock and throws before an order is created.</p>
+      <p><strong>Why is the CAPI call scheduled, not awaited?</strong> Mutations can't <code class="inline">fetch()</code> at all — only actions can reach the network — and even if they could, a slow Meta API would make the order itself hang. Scheduling means the order always writes fast, and the Meta call retries independently.</p>
+      <div class="callout"><strong>💡 Why this matters —</strong><p>Things that must succeed-or-fail together go in one mutation; things allowed to fail independently and retry get scheduled out. This distinction shows up in almost every backend you'll ever build.</p></div>
+    </section>
+
+    <!-- ===================== CH 4 ===================== -->
+    <section class="chapter" id="ch4">
+      <div class="kicker">CHAPTER 4</div>
+      <h2>State on the client</h2>
+      <p>The cart lives in the browser in a <strong>Zustand</strong> store (<code class="inline">lib/cart.ts</code>), persisted to <code class="inline">localStorage</code>:</p>
+      <div class="codeblock">
+        <div class="code-head"><span>lib/cart.ts</span><button class="copy-btn">Copy</button></div>
+        <pre><code><span class="tok-kw">export const</span> useCart = create&lt;CartState&gt;()(
+  persist(
+    (set) =&gt; ({
+      items: [],
+      add: (item, qty = <span class="tok-num">1</span>) =&gt; set((s) =&gt; { <span class="tok-com">/* merge or push line */</span> }),
+      <span class="tok-com">// remove, setQty, clear …</span>
+    }),
+    { name: <span class="tok-str">"luxe_cart_v2"</span> }
+  )
+);</code></pre>
+      </div>
+      <h3>The security lesson: never trust the client's price</h3>
+      <p>Every <code class="inline">CartItem</code> carries a <code class="inline">price</code> field — but it's only ever a <strong>preview</strong>. Look at what <code class="inline">orders.place</code> actually accepts:</p>
+      <div class="codeblock">
+        <div class="code-head"><span>convex/orders.ts — mutation args</span><button class="copy-btn">Copy</button></div>
+        <pre><code>items: v.array(
+  v.object({ productId: v.id(<span class="tok-str">"products"</span>), qty: v.number(), size: v.string(), color: v.optional(v.string()) })
+),
+<span class="tok-com">// no "price" field — the server refuses to even accept one</span></code></pre>
+      </div>
+      <p>If someone opened devtools and submitted <code class="inline">price: 1</code> for a ৳590 t-shirt, it would be silently ignored — the mutation reads <code class="inline">p.price</code> straight from the database, never from the client.</p>
+      <div class="callout"><strong>💡 Why this matters —</strong><p>Any value that affects money, permissions, or ownership must be recomputed or re-checked on the server, every time, no exceptions. The client is a UI, not a source of truth.</p></div>
+    </section>
+
+    <!-- ===================== CH 5 ===================== -->
+    <section class="chapter" id="ch5">
+      <div class="kicker">CHAPTER 5</div>
+      <h2>Animation with Framer Motion</h2>
+      <h3>1 · <code class="inline">whileInView</code> scroll reveals with stagger</h3>
+      <div class="codeblock">
+        <div class="code-head"><span>components/store/Reveal.tsx</span><button class="copy-btn">Copy</button></div>
+        <pre><code>&lt;motion.div
+  initial={{ opacity: <span class="tok-num">0</span>, y: <span class="tok-num">26</span> }}
+  whileInView={{ opacity: <span class="tok-num">1</span>, y: <span class="tok-num">0</span> }}
+  viewport={{ once: <span class="tok-kw">true</span>, amount: <span class="tok-num">0.08</span> }}
+  transition={{ duration: <span class="tok-num">0.7</span>, ease: <span class="tok-str">"easeOut"</span>, delay }}
+&gt;
+  {children}
+&lt;/motion.div&gt;</code></pre>
+      </div>
+      <p><code class="inline">whileInView</code> triggers the moment the element scrolls in — Framer wires the <code class="inline">IntersectionObserver</code> for you. <code class="inline">once: true</code> stops it re-animating; a parent stagger just increases <code class="inline">delay</code> per child (e.g. <code class="inline">delay: i * 0.1</code> on a benefits list).</p>
+      <h3>2 · <code class="inline">AnimatePresence</code> for the cart drawer</h3>
+      <p>Plain React can't animate an element <em>leaving</em> the DOM — by the time an exit animation would run, it's already gone. <code class="inline">AnimatePresence</code> keeps it mounted until the <code class="inline">exit</code> animation finishes.</p>
+      <div class="codeblock">
+        <div class="code-head"><span>components/store/CartDrawer.tsx</span><button class="copy-btn">Copy</button></div>
+        <pre><code>&lt;AnimatePresence&gt;
+  {drawerOpen &amp;&amp; (
+    &lt;motion.aside
+      initial={{ x: <span class="tok-str">"105%"</span> }}
+      animate={{ x: <span class="tok-num">0</span> }}
+      exit={{ x: <span class="tok-str">"105%"</span> }}
+      transition={{ type: <span class="tok-str">"tween"</span>, duration: <span class="tok-num">0.4</span> }}
+    &gt;
+      {<span class="tok-com">/* cart contents */</span>}
+    &lt;/motion.aside&gt;
+  )}
+&lt;/AnimatePresence&gt;</code></pre>
+      </div>
+      <p>The drawer literally slides off-screen rather than vanishing — the checkout page uses the same pattern for its error banner and its bKash fields sliding open (<code class="inline">height: 0 → "auto"</code>).</p>
+      <h3>3 · Staggered word-by-word hero reveal</h3>
+      <p>The homepage hero splits its headline into words, each getting <code class="inline">delay: baseDelay + i * 0.07</code> — no stagger helper needed, just arithmetic on <code class="inline">delay</code>.</p>
+      <div class="callout"><strong>💡 Why this matters —</strong><p>These three patterns cover almost every animation in the app: they're declarative React state (<code class="inline">initial</code>/<code class="inline">animate</code>/<code class="inline">exit</code>), the same mental model as <code class="inline">useState</code>.</p></div>
+    </section>
+
+    <!-- ===================== CH 6 ===================== -->
+    <section class="chapter" id="ch6">
+      <div class="kicker">CHAPTER 6</div>
+      <h2>Payments & the Bangladeshi context</h2>
+      <p><strong>Why COD dominates:</strong> low card penetration and low trust in prepayment mean most Bangladeshi shoppers want to inspect goods before paying the courier. COD is the default payment method in checkout — any store requiring upfront payment loses most of its addressable market here.</p>
+      <p><strong>Why there are no customer accounts:</strong> the project's own requirements are explicit — guest checkout only, because every extra step between "I want this" and "order placed" loses conversions on mobile Facebook traffic. Admin accounts exist; customer accounts don't.</p>
+      <p><strong>Manual bKash verification:</strong> instead of integrating bKash's payment gateway, the store shows its bKash number and instructions; the customer sends money, then types back their own bKash number and transaction ID (TrxID). The order lands with <code class="inline">payment.verified: false</code> until an admin checks their real bKash history and flips it — cheaper and faster to ship than a gateway integration.</p>
+      <p><strong>Delivery-zone fees and the free-delivery threshold:</strong> <code class="inline">lib/pricing.ts</code>'s <code class="inline">calcDeliveryFee</code> charges an inside/outside-Dhaka fee, waived once <code class="inline">subtotal − discount ≥ freeThreshold</code> — all three numbers are admin-configurable, since delivery pricing changes with courier contracts.</p>
+      <p><strong>Why abandoned-checkout capture matters for COD:</strong> "placing an order" and "paying" are separate moments — a customer who types a valid phone but never submits is highly recoverable by a phone call. Checkout debounces a save to <code class="inline">abandonedCheckouts</code> the moment the phone is valid, and <code class="inline">orders.place</code> marks it converted if they do complete.</p>
+      <div class="callout"><strong>💡 Why this matters —</strong><p>Every one of these decisions traces back to how Bangladeshi shoppers actually buy. A generic Shopify-style flow built without that context would convert worse here.</p></div>
+    </section>
+
+    <!-- ===================== CH 7 ===================== -->
+    <section class="chapter" id="ch7">
+      <div class="kicker">CHAPTER 7</div>
+      <h2>The landing-page builder</h2>
+      <p>A landing page is a standalone, single-product funnel at <code class="inline">/l/[slug]</code>. The <code class="inline">landingPages</code> table doesn't store hardcoded components per page — it stores a <code class="inline">sections</code> array of typed content blobs:</p>
+      <div class="codeblock">
+        <div class="code-head"><span>convex/schema.ts</span><button class="copy-btn">Copy</button></div>
+        <pre><code><span class="tok-kw">const</span> landingSection = v.object({
+  type: v.union(v.literal(<span class="tok-str">"hero"</span>), v.literal(<span class="tok-str">"benefits"</span>), v.literal(<span class="tok-str">"gallery"</span>),
+    v.literal(<span class="tok-str">"reviews"</span>), v.literal(<span class="tok-str">"offer"</span>), v.literal(<span class="tok-str">"sizeChart"</span>),
+    v.literal(<span class="tok-str">"faq"</span>), v.literal(<span class="tok-str">"orderForm"</span>)),
+  enabled: v.boolean(),
+  content: v.any(),  <span class="tok-com">// flexible per-section blob</span>
+});</code></pre>
+      </div>
+      <p><code class="inline">components/landing/LandingPage.tsx</code> maps each <code class="inline">type</code> to a matching React component (<code class="inline">Hero</code>, <code class="inline">Benefits</code>, <code class="inline">Gallery</code>…), reading whatever it needs from <code class="inline">content</code>. Building a new landing page is then admin work — pick a product, toggle sections, publish — <strong>no code, no deploy.</strong></p>
+      <p>This is a <strong>data-driven UI</strong>: the page's shape lives in the database as data, and the frontend is a generic renderer. The alternative (one React page per campaign) would mean a deploy for every new ad test — far too slow for someone running dozens of ad variants a week.</p>
+      <p>Each landing page can also set <code class="inline">priceOverride</code>/<code class="inline">deliveryFeeOverride</code> — honored both in the display query <em>and</em>, critically, re-checked server-side inside <code class="inline">orders.place</code> itself, so the override can never be spoofed by the client. Stats (<code class="inline">views</code>, <code class="inline">initiates</code>, <code class="inline">ordersCount</code>) power a per-page conversion rate on the admin dashboard.</p>
+      <div class="callout"><strong>💡 Why this matters —</strong><p>If a non-developer will need to create many similar variations of something frequently, model it as data and build one renderer — don't write bespoke code per instance.</p></div>
+    </section>
+
+    <!-- ===================== CH 8 ===================== -->
+    <section class="chapter" id="ch8">
+      <div class="kicker">CHAPTER 8</div>
+      <h2>Meta Pixel + Conversions API</h2>
+      <p>The <strong>Pixel</strong> is browser JavaScript that fires events like <code class="inline">fbq('track', 'Purchase', …)</code>. Ad blockers, iOS App Tracking Transparency, and Safari's tracking prevention all quietly drop these — every lost event makes Meta's ad optimization worse.</p>
+      <p>The <strong>Conversions API (CAPI)</strong> is the server-side twin: your own backend calls Meta's Graph API directly (<code class="inline">convex/capi.ts</code>, a Convex <em>action</em>) — a server call can't be blocked by anything in the customer's browser.</p>
+      <h3>The key concept: one <code class="inline">event_id</code>, sent to both sides</h3>
+      <p>If both the browser and the server fire <code class="inline">Purchase</code> and Meta can't tell they're the same sale, it counts it <strong>twice</strong>. The fix is <strong>deduplication</strong>: both calls carry the exact same <code class="inline">event_id</code>, and Meta discards the second one it receives.</p>
+      <div class="codeblock">
+        <div class="code-head"><span>app/checkout/page.tsx</span><button class="copy-btn">Copy</button></div>
+        <pre><code><span class="tok-kw">const</span> eventId = uuid();
+<span class="tok-kw">const</span> res = <span class="tok-kw">await</span> placeOrder({ ...,  tracking: { eventId, ...getTrackingContext() } });
+<span class="tok-com">// same id, fired to the browser pixel after the order succeeds:</span>
+window.fbq?.(<span class="tok-str">"track"</span>, <span class="tok-str">"Purchase"</span>, { value: res.total, currency: <span class="tok-str">"BDT"</span> }, { eventID: eventId });</code></pre>
+      </div>
+      <p>The server receives that same id as <code class="inline">args.tracking.eventId</code> in <code class="inline">orders.place</code> and passes it straight into the scheduled CAPI call.</p>
+      <h3>PII hashing — on the server, never the browser</h3>
+      <div class="codeblock">
+        <div class="code-head"><span>convex/capi.ts</span><button class="copy-btn">Copy</button></div>
+        <pre><code><span class="tok-kw">function</span> <span class="tok-fn">sha256</span>(s) { <span class="tok-kw">return</span> createHash(<span class="tok-str">"sha256"</span>).update(s).digest(<span class="tok-str">"hex"</span>); }
+
+<span class="tok-kw">const</span> ph = sha256(normalizeBDPhone(args.customer.phone));
+user_data.ph = [ph];
+user_data.external_id = [ph];  <span class="tok-com">// stable customer key — no email/accounts in this market</span></code></pre>
+      </div>
+      <p><code class="inline">normalizeBDPhone</code> canonicalizes any of <code class="inline">01XXXXXXXXX</code> / <code class="inline">1XXXXXXXXX</code> / <code class="inline">+8801XXXXXXXXX</code> into one form <em>before</em> hashing — hashing an inconsistent format would silently break Meta's matching.</p>
+      <h3><code class="inline">fbclid</code> → <code class="inline">_fbc</code> capture</h3>
+      <p>When someone clicks a Facebook ad, the URL carries <code class="inline">?fbclid=…</code>. The project's own requirements call this out as <strong>"the biggest EMQ lever for a COD store"</strong> — since there's no email-based matching fallback here:</p>
+      <div class="codeblock">
+        <div class="code-head"><span>lib/tracking.ts</span><button class="copy-btn">Copy</button></div>
+        <pre><code><span class="tok-kw">const</span> fbclid = params.get(<span class="tok-str">"fbclid"</span>);
+<span class="tok-kw">if</span> (fbclid &amp;&amp; !readCookie(<span class="tok-str">"_fbc"</span>)) {
+  <span class="tok-kw">const</span> fbc = <span class="tok-str">`fb.1.${Date.now()}.${fbclid}`</span>;
+  document.cookie = <span class="tok-str">`_fbc=${encodeURIComponent(fbc)}; path=/; max-age=${90 * 86400}`</span>;
+}</code></pre>
+      </div>
+      <p><strong>Why Purchase is fired server-side:</strong> <code class="inline">orders.place</code> schedules the CAPI Purchase as part of creating the order, making the server the source of truth for whether a sale happened. The browser pixel fire is a redundant duplicate for dedup — if the tab crashes right after checkout, Meta still records the sale.</p>
+      <p>Failed CAPI calls retry up to 3 times with backoff and log every attempt to <code class="inline">capiLogs</code>, visible on the admin's Tracking Debug page.</p>
+      <div class="callout"><strong>💡 Why this matters —</strong><p>"One shared ID across two systems so a downstream consumer can dedupe" is a general distributed-systems pattern — you'll meet it again as "idempotency keys" in payment processors and webhooks.</p></div>
+    </section>
+
+    <!-- ===================== CH 9 ===================== -->
+    <section class="chapter" id="ch9">
+      <div class="kicker">CHAPTER 9</div>
+      <h2>Testing</h2>
+      <p>A <strong>unit test</strong> calls one small piece of code directly — no browser, no server, no database — and asserts the output. <code class="inline">tests/unit/*.test.ts</code> runs on Vitest (<code class="inline">npm test</code>).</p>
+      <h3>Design for testability — the real lesson here</h3>
+      <p><code class="inline">lib/pricing.ts</code> and <code class="inline">lib/validation.ts</code> are <strong>pure functions</strong> — no React, no Convex, no browser import — and they're deliberately <strong>extracted</strong> so both <code class="inline">orders.place</code> (backend) and the checkout page's live total preview (frontend) import the exact same math. That means the two can never silently disagree, <em>and</em> the money logic is 100% unit-testable without spinning up Convex or React at all.</p>
+      <h3>Black box vs. white box</h3>
+      <p><strong>Black box:</strong> testing based only on documented input → output behavior, without reading the implementation. <strong>White box:</strong> reading the actual branches and deliberately exercising each one, tracked as <strong>statement coverage</strong> (% of lines run) and <strong>branch coverage</strong> (% of if/else paths taken both ways). This suite reports <strong>98.63% statement coverage</strong>, with <code class="inline">pricing.ts</code> and <code class="inline">validation.ts</code> at 100%.</p>
+      <h3>Boundary value analysis</h3>
+      <p>Testing values right at, just below, and just above a threshold — off-by-one bugs live exactly there. The free-delivery threshold (৳2000) is tested at all three points:</p>
+      <div class="codeblock">
+        <div class="code-head"><span>tests/unit/pricing.test.ts</span><button class="copy-btn">Copy</button></div>
+        <pre><code><span class="tok-fn">it</span>(<span class="tok-str">"is free at exactly the threshold (boundary: 2000)"</span>, () =&gt; {
+  expect(calcDeliveryFee({ ...base, subtotal: <span class="tok-num">2000</span>, discount: <span class="tok-num">0</span>, area: <span class="tok-str">"dhaka"</span> })).toBe(<span class="tok-num">0</span>);
+});
+<span class="tok-fn">it</span>(<span class="tok-str">"charges a fee just below the threshold (boundary: 1999)"</span>, () =&gt; {
+  expect(calcDeliveryFee({ ...base, subtotal: <span class="tok-num">1999</span>, discount: <span class="tok-num">0</span>, area: <span class="tok-str">"dhaka"</span> })).toBe(<span class="tok-num">80</span>);
+});
+<span class="tok-fn">it</span>(<span class="tok-str">"is free just above the threshold (boundary: 2001)"</span>, () =&gt; {
+  expect(calcDeliveryFee({ ...base, subtotal: <span class="tok-num">2001</span>, discount: <span class="tok-num">0</span>, area: <span class="tok-str">"outside"</span> })).toBe(<span class="tok-num">0</span>);
+});</code></pre>
+      </div>
+      <p>This proves the comparison uses <code class="inline">&gt;=</code>, not <code class="inline">&gt;</code> — a one-character bug these three tests would catch if someone "simplified" the operator later. A similar boundary sweep tests every valid/invalid Bangladeshi phone prefix (<code class="inline">013</code>–<code class="inline">019</code> valid, <code class="inline">011</code>/<code class="inline">012</code> invalid, chosen because they're adjacent to the boundary).</p>
+      <p>A <strong>regression</strong> is a previously-fixed bug reappearing after a later change — the reason this whole suite re-runs on every future edit instead of being a one-time manual check.</p>
+      <div class="callout"><strong>💡 Why this matters —</strong><p>Knowing which parts of your code are cheap to test — and designing more of your code to be like that — is the difference between a codebase you can change confidently and one everyone's afraid to touch.</p></div>
+    </section>
+
+    <!-- ===================== CH 10 ===================== -->
+    <section class="chapter" id="ch10">
+      <div class="kicker">CHAPTER 10</div>
+      <h2>Deployment</h2>
+      <p><code class="inline">npx convex dev</code> connects to a personal <strong>dev deployment</strong>; <code class="inline">npx convex deploy</code> pushes to a separate <strong>production deployment</strong> with its own URL and env vars — a dev mistake can't leak into prod. <strong>Vercel</strong> hosts the Next.js frontend and needs <code class="inline">NEXT_PUBLIC_CONVEX_URL</code> pointed at the production Convex deployment.</p>
+      <div class="tablewrap"><table>
+        <tr><th>Variable</th><th>Set where</th><th>Why</th></tr>
+        <tr><td><code>NEXT_PUBLIC_CONVEX_URL</code></td><td>.env.local (dev) / Vercel settings (prod)</td><td>Frontend needs it to open the Convex connection</td></tr>
+        <tr><td><code>ADMIN_PASSWORD</code></td><td><code>npx convex env set</code></td><td>Read server-side only, never shipped to the browser</td></tr>
+        <tr><td><code>pixelId</code>, <code>capiToken</code></td><td>the <code>settings</code> table, via /admin/settings</td><td>Runtime-configurable with no redeploy; token stripped from public reads</td></tr>
+      </table></div>
+      <h3>A real class of deploy bug: invisible characters in env vars</h3>
+      <p>A classic Windows pitfall: PowerShell's default text encoding can prepend an invisible <strong>UTF-8 BOM</strong> when writing an env-var value through certain commands (<code class="inline">Out-File</code>, <code class="inline">Set-Content</code> without an explicit encoding, some pipe redirections). The value looks visually identical in your editor — but Convex's client-side URL parsing rejects it outright, with a generic error that gives no hint the real problem is an invisible leading byte.</p>
+      <p>The fix once you know to look for it: regenerate the value through a BOM-safe path (Convex's own <code class="inline">.env.local</code> writer is safe), or strip it programmatically.</p>
+      <div class="callout"><strong>💡 Why this matters —</strong><p>"A value that looks right in every tool you check it with, but fails a strict parser" is common enough (trailing whitespace, wrong line endings, invisible Unicode) that "diff the raw bytes, not just what you can see" is a genuinely useful debugging instinct.</p></div>
+    </section>
+
+    <!-- ===================== CH 11 ===================== -->
+    <section class="chapter" id="ch11">
+      <div class="kicker">CHAPTER 11</div>
+      <h2>Exercises</h2>
+      <div class="exercise"><div class="diff">⭐</div><div class="body"><strong>Change the free-delivery threshold</strong><p>Update <code class="inline">DEFAULT_SETTINGS.freeDeliveryThreshold</code> in <code class="inline">convex/lib.ts</code>.</p><div class="hint">Hint: trace where DEFAULT_SETTINGS is spread into publicSettings.</div></div></div>
+      <div class="exercise"><div class="diff">⭐</div><div class="body"><strong>Add a "Best Seller" badge</strong><p>Products already have <code class="inline">badges: string[]</code> — add the option to the admin form and render it.</p><div class="hint">Files: app/admin/products/page.tsx, app/page.tsx</div></div></div>
+      <div class="exercise"><div class="diff">⭐⭐</div><div class="body"><strong>Add a product field (e.g. <code class="inline">material</code>)</strong><p>Add it to schema.ts and productFields, then surface it in the admin form and product page.</p></div></div>
+      <div class="exercise"><div class="diff">⭐⭐</div><div class="body"><strong>Write a unit test for a new pricing rule</strong><p>Cap promo discounts at 50% in calcDiscount; add boundary tests at 49/50/51%.</p></div></div>
+      <div class="exercise"><div class="diff">⭐⭐⭐</div><div class="body"><strong>Add a new landing-page section type</strong><p>E.g. "video" — add the literal to the schema union in two places, add a component, wire the editor.</p></div></div>
+      <div class="exercise"><div class="diff">⭐⭐⭐</div><div class="body"><strong>Add a new order status</strong><p>E.g. "awaiting_stock" — decide whether it should fire a CAPI event or restock, like existing statuses do.</p></div></div>
+      <div class="exercise"><div class="diff">⭐⭐⭐</div><div class="body"><strong>Implement product search</strong><p>Add a search arg to products.list matching name/description; wire a search box on the homepage.</p></div></div>
+      <div class="exercise"><div class="diff">⭐⭐⭐⭐</div><div class="body"><strong>Add a "buy one get one cheapest free" promo type</strong><p>Redesign the Promo shape in lib/pricing.ts, thread cart line items into orders.place, write full test coverage including edge cases.</p></div></div>
+      <div class="exercise"><div class="diff">⭐⭐⭐⭐</div><div class="body"><strong>Add a low-stock admin alert</strong><p>Surface variants below a threshold after orders.place decrements stock — decide if that belongs in the mutation or a separate query.</p></div></div>
+      <div class="exercise"><div class="diff">⭐⭐⭐⭐</div><div class="body"><strong>Rate-limit orders.place</strong><p>Guard against fake-order spam — decide what to key on (phone? IP isn't easily visible to a mutation) and where counter state lives.</p></div></div>
+    </section>
+
+    <!-- ===================== CH 12 ===================== -->
+    <section class="chapter" id="ch12">
+      <div class="kicker">CHAPTER 12</div>
+      <h2>Glossary</h2>
+      <dl class="glossary">
+        <div><dt>Mutation</dt><dd>A Convex function that writes to the database, atomically (all-or-nothing).</dd></div>
+        <div><dt>Query</dt><dd>A Convex read that automatically re-runs on the client whenever the data it read changes — "reactive."</dd></div>
+        <div><dt>Action</dt><dd>A Convex function allowed to call the outside world, but must go through a query/mutation to touch the DB.</dd></div>
+        <div><dt>Scheduler</dt><dd>Convex's mechanism to queue work for later, outside the current transaction — replaces a job queue.</dd></div>
+        <div><dt>Index</dt><dd>A precomputed lookup structure so the database can find matching rows fast instead of scanning every row.</dd></div>
+        <div><dt>Hydration</dt><dd>React "waking up" server-sent HTML by attaching listeners/state in the browser, making it interactive.</dd></div>
+        <div><dt>SSR / CSR</dt><dd>Server-Side Rendering (HTML built per request on the server) vs. Client-Side Rendering (browser builds it with JS).</dd></div>
+        <div><dt>Reactive query</dt><dd>A read whose result — and the component using it — auto-updates when the underlying data changes, no manual refetch.</dd></div>
+        <div><dt>Deduplication</dt><dd>Recognizing two tracking events represent the same real-world event via a shared ID, and counting it once.</dd></div>
+        <div><dt>EMQ</dt><dd>Event Match Quality — Meta's score for how confidently a server event matches a real ad-click/person.</dd></div>
+        <div><dt>COD</dt><dd>Cash on Delivery — the customer pays the courier in cash when the order physically arrives.</dd></div>
+        <div><dt>Slug</dt><dd>A URL-safe, human-readable identifier, e.g. <code class="inline">essential-black-tee</code>.</dd></div>
+        <div><dt>Variant</dt><dd>A specific purchasable configuration of a product — here, a size + color pair with its own stock.</dd></div>
+        <div><dt>SKU</dt><dd>Stock Keeping Unit — a unique id for one sellable variant; here, (productId, size, color) plays that role.</dd></div>
+        <div><dt>Coverage</dt><dd>The percentage of code your tests actually execute. High coverage doesn't guarantee correctness; low coverage guarantees blind spots.</dd></div>
+        <div><dt>Boundary value analysis</dt><dd>Deliberately testing values at, just below, and just above a threshold, where off-by-one bugs cluster.</dd></div>
+        <div><dt>Regression</dt><dd>A previously-fixed bug reappearing after a later change — why tests re-run continuously, not once.</dd></div>
+      </dl>
+    </section>
+
+    <footer class="end">
+      Outfleek Tutorial · full source at <a href="https://github.com/vampxlr/outfleek" target="_blank" rel="noopener">github.com/vampxlr/outfleek</a> · live store at <a href="https://outfleek.vercel.app" target="_blank" rel="noopener">outfleek.vercel.app</a>
+    </footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  // progress bar
+  var bar = document.getElementById("progress");
+  function onScroll() {
+    var h = document.documentElement;
+    var scrolled = h.scrollTop;
+    var max = h.scrollHeight - h.clientHeight;
+    bar.style.width = (max > 0 ? (scrolled / max) * 100 : 0) + "%";
+  }
+  document.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  // mobile nav toggle
+  var sidebar = document.getElementById("sidebar");
+  var toggle = document.getElementById("navToggle");
+  if (toggle) {
+    toggle.addEventListener("click", function () {
+      sidebar.classList.toggle("open");
+    });
+  }
+  document.querySelectorAll(".navlist a").forEach(function (a) {
+    a.addEventListener("click", function () {
+      sidebar.classList.remove("open");
+    });
+  });
+
+  // scroll-spy
+  var links = Array.prototype.slice.call(document.querySelectorAll(".navlist a"));
+  var sections = links.map(function (a) {
+    return document.querySelector(a.getAttribute("href"));
+  });
+  function spy() {
+    var pos = window.scrollY + window.innerHeight * 0.3;
+    var activeIdx = 0;
+    sections.forEach(function (sec, i) {
+      if (sec && sec.offsetTop <= pos) activeIdx = i;
+    });
+    links.forEach(function (a, i) {
+      a.classList.toggle("active", i === activeIdx);
+    });
+  }
+  document.addEventListener("scroll", spy, { passive: true });
+  spy();
+
+  // reveal-on-scroll
+  var revealables = document.querySelectorAll("section.chapter");
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealed");
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: "0px 0px -60px 0px" }
+    );
+    revealables.forEach(function (el) { io.observe(el); });
+  } else {
+    revealables.forEach(function (el) { el.classList.add("revealed"); });
+  }
+
+  // copy-to-clipboard
+  document.querySelectorAll(".copy-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var pre = btn.closest(".codeblock").querySelector("pre");
+      var text = pre.innerText;
+      var done = function () {
+        var original = btn.textContent;
+        btn.textContent = "Copied!";
+        btn.classList.add("copied");
+        setTimeout(function () {
+          btn.textContent = original;
+          btn.classList.remove("copied");
+        }, 1400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(done);
+      } else {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (e) {}
+        document.body.removeChild(ta);
+        done();
+      }
+    });
+  });
+})();
+</script>
