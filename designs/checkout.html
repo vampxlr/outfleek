@@ -1,0 +1,410 @@
+<title>Checkout — ATELIER DHAKA</title>
+<style>
+  :root{
+    --bg:#faf9f6; --bg2:#f3f1ec; --ink:#191817; --ink2:#5c5a55;
+    --hair:#e4e1da; --gold:#b08d3e; --white:#ffffff; --bkash:#e2136e;
+    --serif:Georgia,'Times New Roman',serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
+  a{color:inherit;text-decoration:none}
+
+  .announce{background:var(--ink);color:#d8d4cc;text-align:center;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:9px 16px}
+  .announce b{color:var(--gold);font-weight:600}
+
+  header{position:sticky;top:0;z-index:60;background:rgba(250,249,246,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--hair);transition:box-shadow .35s ease}
+  header.scrolled{box-shadow:0 6px 24px rgba(25,24,23,.08)}
+  .hwrap{max-width:1280px;margin:0 auto;padding:0 28px;height:66px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .logo{font-family:var(--serif);font-size:21px;letter-spacing:.26em;font-weight:400}
+  .logo em{font-style:normal;color:var(--gold)}
+  nav.mainnav{display:flex;gap:34px}
+  nav.mainnav a{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);position:relative;padding:6px 0;transition:color .25s}
+  nav.mainnav a:hover,nav.mainnav a.active{color:var(--ink)}
+  nav.mainnav a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--gold);transition:width .3s ease}
+  nav.mainnav a:hover::after,nav.mainnav a.active::after{width:100%}
+  .hicons{display:flex;align-items:center;gap:18px}
+  .icon-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;position:relative;color:var(--ink);transition:opacity .2s}
+  .icon-btn:hover{opacity:.6}
+  .icon-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .cart-count{position:absolute;top:1px;right:0;min-width:16px;height:16px;border-radius:8px;background:var(--gold);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;padding:0 4px}
+
+  /* Page title */
+  .ptitle{max-width:1280px;margin:0 auto;padding:52px 28px 34px;text-align:center;border-bottom:1px solid var(--hair)}
+  .ptitle .kicker{font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+  .ptitle h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,4.6vw,48px);line-height:1.1}
+  .ptitle h1 em{font-style:italic;color:var(--gold)}
+  .ptitle .rule{width:56px;height:1px;background:var(--gold);margin:22px auto 0}
+
+  /* Layout */
+  .cowrap{max-width:1280px;margin:0 auto;padding:44px 28px 90px;display:grid;grid-template-columns:1.5fr 1fr;gap:56px;align-items:start}
+
+  .sec{border:1px solid var(--hair);background:var(--white);padding:30px 30px 34px;margin-bottom:26px}
+  .sec h2{font-family:var(--serif);font-weight:400;font-size:21px;letter-spacing:.04em;margin-bottom:4px}
+  .sec .sub{font-size:12px;letter-spacing:.08em;color:var(--ink2);margin-bottom:22px}
+  .secnum{display:inline-flex;width:26px;height:26px;border:1px solid var(--gold);border-radius:50%;align-items:center;justify-content:center;font-size:12px;color:var(--gold);margin-right:10px;vertical-align:2px;font-family:var(--serif)}
+
+  /* Fields — hairline + floating labels */
+  .field{position:relative;margin-bottom:26px}
+  .field input,.field textarea{width:100%;border:none;border-bottom:1px solid var(--hair);background:transparent;padding:20px 2px 8px;font-family:var(--sans);font-size:15px;color:var(--ink);outline:none;transition:border-color .3s;border-radius:0;resize:vertical}
+  .field textarea{min-height:84px;line-height:1.5}
+  .field label{position:absolute;left:2px;top:18px;font-size:14px;color:#a9a49b;letter-spacing:.04em;pointer-events:none;transition:all .25s ease}
+  .field input:focus,.field textarea:focus{border-color:var(--ink)}
+  .field input:focus~label,.field input.filled~label,
+  .field textarea:focus~label,.field textarea.filled~label{top:0;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+  .field .hint{font-size:11px;letter-spacing:.06em;color:#a9a49b;margin-top:6px}
+  .field.error input,.field.error textarea{border-color:#c0392b}
+  .field.error label{color:#c0392b}
+  .field .err{display:none;font-size:11px;letter-spacing:.06em;color:#c0392b;margin-top:6px}
+  .field.error .err{display:block;animation:shake .35s ease}
+  .field.error .hint{display:none}
+  @keyframes shake{0%,100%{transform:none}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+  /* Delivery radios */
+  .areas{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:26px}
+  .area{border:1px solid var(--hair);padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .3s ease;background:var(--bg)}
+  .area input{display:none}
+  .area .dot{width:16px;height:16px;border:1px solid #b7b2a8;border-radius:50%;flex:none;position:relative;transition:border-color .25s}
+  .area .dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--gold);transform:scale(0);transition:transform .25s cubic-bezier(.2,.8,.3,1.4)}
+  .area.sel{border-color:var(--ink);background:var(--white)}
+  .area.sel .dot{border-color:var(--gold)}
+  .area.sel .dot::after{transform:scale(1)}
+  .area .an{font-size:13px;letter-spacing:.06em}
+  .area .af{font-size:11.5px;color:var(--ink2);letter-spacing:.04em}
+
+  /* Payment cards */
+  .pays{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .pay{border:1px solid var(--hair);background:var(--bg);padding:22px 18px;text-align:center;cursor:pointer;transition:all .3s ease;position:relative;overflow:hidden}
+  .pay .pe{font-size:26px;display:block;margin-bottom:8px;transition:transform .3s ease}
+  .pay .pn{font-family:var(--serif);font-size:16px}
+  .pay .pd{font-size:11px;letter-spacing:.08em;color:var(--ink2);margin-top:4px}
+  .pay .tick{position:absolute;top:10px;right:12px;width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;transform:scale(0);transition:transform .3s cubic-bezier(.2,.8,.3,1.4)}
+  .pay.sel{border-color:var(--ink);background:var(--white);box-shadow:0 10px 26px rgba(25,24,23,.08);transform:translateY(-3px)}
+  .pay.sel .tick{transform:scale(1)}
+  .pay.sel .pe{transform:scale(1.15)}
+  .pay.bkash.sel{border-color:var(--bkash)}
+  .pay.bkash.sel .tick{background:var(--bkash)}
+  .pay.bkash.sel .pn{color:var(--bkash)}
+  .bkpanel{max-height:0;overflow:hidden;transition:max-height .5s ease,opacity .4s ease,margin .4s ease;opacity:0;margin-top:0}
+  .bkpanel.open{max-height:340px;opacity:1;margin-top:22px}
+  .bkinfo{border:1px solid rgba(226,19,110,.25);background:rgba(226,19,110,.04);padding:16px 18px;font-size:13px;color:var(--ink2);margin-bottom:20px;letter-spacing:.02em}
+  .bkinfo b{color:var(--bkash);letter-spacing:.06em}
+
+  /* Place order */
+  .placebtn{display:block;width:100%;background:var(--ink);color:var(--bg);text-align:center;padding:17px;font-size:12px;letter-spacing:.24em;text-transform:uppercase;transition:background .25s ease,transform .15s ease;margin-top:4px}
+  .placebtn:hover{background:var(--gold)}
+  .placebtn:active{transform:scale(.985)}
+
+  /* Summary */
+  .summary{position:sticky;top:92px;border:1px solid var(--hair);background:var(--white)}
+  .shead{padding:22px 26px;border-bottom:1px solid var(--hair)}
+  .shead h2{font-family:var(--serif);font-weight:400;font-size:20px;letter-spacing:.06em}
+  .sitems{padding:6px 26px;max-height:340px;overflow-y:auto}
+  .sitem{display:flex;gap:14px;align-items:center;padding:16px 0;border-bottom:1px solid var(--hair)}
+  .sitem:last-child{border-bottom:none}
+  .sthumb{width:48px;height:60px;flex:none;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#e9e5dc,#d6d0c2);position:relative}
+  .sthumb svg{width:70%;height:auto}
+  .sqty{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;border-radius:9px;background:var(--ink);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;padding:0 5px}
+  .sinfo{flex:1}
+  .sinfo .n{font-family:var(--serif);font-size:14.5px}
+  .sinfo .m{font-size:11.5px;color:var(--ink2);letter-spacing:.04em}
+  .sprice{font-size:13.5px;letter-spacing:.04em}
+  .stotals{border-top:1px solid var(--hair);padding:20px 26px 24px;background:var(--bg2)}
+  .srow{display:flex;justify-content:space-between;font-size:13px;letter-spacing:.06em;color:var(--ink2);margin-bottom:8px}
+  .srow.total{font-family:var(--serif);font-size:18px;color:var(--ink);border-top:1px solid var(--hair);padding-top:14px;margin-top:12px;margin-bottom:0}
+  .srow .free{color:var(--gold);letter-spacing:.12em;text-transform:uppercase;font-size:11.5px}
+  .amount.flash{animation:flash .5s ease}
+  @keyframes flash{0%{color:var(--gold);transform:translateY(-3px)}100%{color:inherit;transform:none}}
+  .paybadges{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .pb{border:1px solid var(--hair);background:var(--white);padding:7px 14px;font-size:11px;letter-spacing:.08em;font-weight:600}
+  .pb.bkash{color:#d12053}.pb.nagad{color:#ec1d24}.pb.cod{color:var(--ink2)}
+
+  /* Empty cart */
+  .emptycart{max-width:560px;margin:0 auto;padding:90px 28px 120px;text-align:center}
+  .emptycart .em{font-size:44px;display:block;margin-bottom:20px;opacity:.5}
+  .emptycart h2{font-family:var(--serif);font-weight:400;font-size:28px;margin-bottom:12px}
+  .emptycart p{color:var(--ink2);font-size:14px;margin-bottom:30px}
+  .backbtn{display:inline-block;background:var(--ink);color:var(--bg);padding:15px 40px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;transition:background .25s}
+  .backbtn:hover{background:var(--gold)}
+
+  /* Reveal */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* Footer */
+  footer{border-top:1px solid var(--hair);background:var(--bg2)}
+  .fwrap{max-width:1280px;margin:0 auto;padding:64px 28px 30px;display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:40px}
+  .fcol h4{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink);margin-bottom:18px;font-weight:600}
+  .fcol a{display:block;font-size:13px;color:var(--ink2);margin-bottom:10px;transition:color .2s}
+  .fcol a:hover{color:var(--gold)}
+  .fcol p{font-size:13px;color:var(--ink2);max-width:280px}
+  .flogo{font-family:var(--serif);font-size:19px;letter-spacing:.26em;margin-bottom:14px}
+  .fbottom{border-top:1px solid var(--hair);text-align:center;padding:18px;font-size:11px;letter-spacing:.12em;color:#a9a49b;text-transform:uppercase}
+
+  /* Success overlay */
+  .success{position:fixed;inset:0;z-index:200;background:rgba(250,249,246,.98);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .5s ease}
+  .success.show{opacity:1;pointer-events:auto}
+  .sbox{text-align:center;max-width:480px;padding:40px 28px;transform:translateY(24px);transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+  .success.show .sbox{transform:none}
+  .ck{width:96px;height:96px;margin:0 auto 26px}
+  .ck circle{fill:none;stroke:var(--gold);stroke-width:1.5;stroke-dasharray:302;stroke-dashoffset:302}
+  .ck path{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60}
+  .success.show .ck circle{animation:draw 1s ease forwards .2s}
+  .success.show .ck path{animation:draw .6s ease forwards .9s}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .sbox h2{font-family:var(--serif);font-weight:400;font-size:clamp(30px,5vw,42px);margin-bottom:12px}
+  .sbox h2 em{font-style:italic;color:var(--gold)}
+  .sbox .onum{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
+  .sbox p{color:var(--ink2);font-size:14px;margin-bottom:8px}
+  .sbox .srule{width:56px;height:1px;background:var(--gold);margin:22px auto}
+  .sbox .backbtn{margin-top:6px}
+
+  @media(max-width:980px){
+    .cowrap{grid-template-columns:1fr;gap:40px}
+    .summary{position:static}
+    .fwrap{grid-template-columns:1fr 1fr;gap:34px}
+  }
+  @media(max-width:680px){
+    nav.mainnav{display:none}
+    .hwrap{padding:0 18px}
+    .cowrap,.ptitle{padding-left:18px;padding-right:18px}
+    .sec{padding:24px 18px 26px}
+    .areas,.pays{grid-template-columns:1fr}
+    .fwrap{grid-template-columns:1fr;padding:48px 18px 24px}
+  }
+</style>
+
+<div class="announce">Free delivery over <b>৳2000</b> &nbsp;·&nbsp; Cash on Delivery available nationwide</div>
+
+<header id="header">
+  <div class="hwrap">
+    <a class="logo" href="option-1-minimal-luxe.html">ATELIER<em>·</em>DHAKA</a>
+    <nav class="mainnav">
+      <a href="option-1-minimal-luxe.html">Home</a>
+      <a href="option-1-minimal-luxe.html#shop">Shop</a>
+      <a href="#" class="active">Checkout</a>
+    </nav>
+    <div class="hicons">
+      <a class="icon-btn" href="option-1-minimal-luxe.html" aria-label="Cart">
+        <svg viewBox="0 0 24 24"><path d="M6 7h12l1.2 12.2a1 1 0 0 1-1 1.1H5.8a1 1 0 0 1-1-1.1L6 7z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<section class="ptitle">
+  <div class="kicker reveal">Secure Checkout</div>
+  <h1 class="reveal">Almost <em>yours.</em></h1>
+  <div class="rule reveal"></div>
+</section>
+
+<div id="pageBody"></div>
+
+<footer id="footer">
+  <div class="fwrap">
+    <div class="fcol">
+      <div class="flogo">ATELIER·DHAKA</div>
+      <p>A premium menswear studio from Dhaka. Small batches, honest fabric, timeless cuts — delivered anywhere in Bangladesh.</p>
+    </div>
+    <div class="fcol">
+      <h4>Shop</h4>
+      <a href="option-1-minimal-luxe.html#shop">T-Shirts</a><a href="option-1-minimal-luxe.html#shop">Polos</a><a href="option-1-minimal-luxe.html#shop">Hoodies</a><a href="option-1-minimal-luxe.html#shop">Drop Shoulder</a>
+    </div>
+    <div class="fcol">
+      <h4>Help</h4>
+      <a href="#">Size Guide</a><a href="#">Delivery &amp; Returns</a><a href="#">Track Order</a><a href="#">Contact</a>
+    </div>
+    <div class="fcol">
+      <h4>We Accept</h4>
+      <div class="paybadges">
+        <span class="pb bkash">bKash</span>
+        <span class="pb nagad">Nagad</span>
+        <span class="pb cod">Cash on Delivery</span>
+      </div>
+    </div>
+  </div>
+  <div class="fbottom">© 2026 Atelier Dhaka · Crafted in Bangladesh</div>
+</footer>
+
+<div class="success" id="success">
+  <div class="sbox">
+    <svg class="ck" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48"/>
+      <path d="M30 52 L44 66 L72 36"/>
+    </svg>
+    <h2>Order <em>Confirmed!</em></h2>
+    <div class="onum" id="orderNum">#LX-00000000-0000</div>
+    <p id="successPay">Payment: Cash on Delivery</p>
+    <p id="successTotal"></p>
+    <p>We'll call you shortly to confirm your order. Thank you for choosing Atelier Dhaka.</p>
+    <div class="srule"></div>
+    <a class="backbtn" href="option-1-minimal-luxe.html">Continue Shopping</a>
+  </div>
+</div>
+
+<script>
+(function(){
+  function tk(n){return '৳'+n.toLocaleString('en-IN');}
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function teeSvg(color){
+    return '<svg viewBox="0 0 100 100"><path fill="'+color+'" stroke="rgba(0,0,0,.12)" stroke-width="1" d="M35 12 L20 20 L8 38 L20 46 L24 38 L24 88 L76 88 L76 38 L80 46 L92 38 L80 20 L65 12 C62 19 56 22 50 22 C44 22 38 19 35 12 Z"/></svg>';
+  }
+  var TEES=['#191817','#3a3835','#f5f1e6','#22262e','#8f8a80','#cbb894','#5b6663','#2e4237'];
+
+  var cart=[];
+  try{cart=JSON.parse(localStorage.getItem('luxe_cart'))||[];}catch(e){cart=[];}
+  if(!Array.isArray(cart))cart=[];
+  cart=cart.filter(function(i){return i&&i.name&&i.price>0&&i.qty>0;});
+
+  var body=document.getElementById('pageBody');
+  var count=cart.reduce(function(s,i){return s+i.qty;},0);
+  document.getElementById('cartCount').textContent=count;
+
+  /* Empty state */
+  if(!cart.length){
+    body.innerHTML='<div class="emptycart reveal"><span class="em">🧺</span><h2>Your cart is empty</h2>'+
+      '<p>Nothing here yet — beautiful basics await in the collection.</p>'+
+      '<a class="backbtn" href="option-1-minimal-luxe.html">Back to the Shop</a></div>';
+    observeReveals(); headerFx(); return;
+  }
+
+  var subtotal=cart.reduce(function(s,i){return s+i.price*i.qty;},0);
+
+  body.innerHTML=
+  '<div class="cowrap"><div class="coleft">'+
+
+  '<section class="sec reveal"><h2><span class="secnum">1</span>Delivery Details</h2>'+
+  '<div class="sub">Where should we send your order?</div>'+
+  '<div class="field" id="f-name"><input type="text" id="name" autocomplete="name"><label for="name">Full Name *</label><div class="err">Please enter your full name.</div></div>'+
+  '<div class="field" id="f-phone"><input type="tel" id="phone" maxlength="11" autocomplete="tel"><label for="phone">Phone Number *</label><div class="hint">Format: 01XXXXXXXXX</div><div class="err">Enter a valid BD number (01XXXXXXXXX).</div></div>'+
+  '<div class="field" id="f-addr"><textarea id="addr" autocomplete="street-address"></textarea><label for="addr">Full Address *</label><div class="err">Please enter your delivery address.</div></div>'+
+  '<div class="sub" style="margin-bottom:12px">Delivery Area — free over ৳2000</div>'+
+  '<div class="areas" id="areas">'+
+    '<label class="area sel"><input type="radio" name="area" value="80" checked><span class="dot"></span><span><span class="an">Inside Dhaka</span><br><span class="af">৳80 · 1–2 days</span></span></label>'+
+    '<label class="area"><input type="radio" name="area" value="130"><span class="dot"></span><span><span class="an">Outside Dhaka</span><br><span class="af">৳130 · 2–4 days</span></span></label>'+
+  '</div>'+
+  '<div class="field"><textarea id="notes" style="min-height:56px"></textarea><label for="notes">Order Notes (optional)</label></div>'+
+  '</section>'+
+
+  '<section class="sec reveal"><h2><span class="secnum">2</span>Payment Method</h2>'+
+  '<div class="sub">Choose how you would like to pay.</div>'+
+  '<div class="pays">'+
+    '<div class="pay sel" data-pay="cod" tabindex="0"><span class="tick">✓</span><span class="pe">💵</span><div class="pn">Cash on Delivery</div><div class="pd">Pay when it arrives</div></div>'+
+    '<div class="pay bkash" data-pay="bkash" tabindex="0"><span class="tick">✓</span><span class="pe">📱</span><div class="pn">bKash</div><div class="pd">Send money now</div></div>'+
+  '</div>'+
+  '<div class="bkpanel" id="bkpanel">'+
+    '<div class="bkinfo">Send money to <b>01XXXXXXXXX</b> (personal) and enter your bKash number &amp; Transaction ID below.</div>'+
+    '<div class="field" id="f-bknum"><input type="tel" id="bknum" maxlength="11"><label for="bknum">Your bKash Number *</label><div class="err">Enter a valid bKash number (01XXXXXXXXX).</div></div>'+
+    '<div class="field" id="f-bktrx"><input type="text" id="bktrx"><label for="bktrx">Transaction ID *</label><div class="err">Please enter the Transaction ID.</div></div>'+
+  '</div>'+
+  '<button class="placebtn" id="placeBtn">Place Order</button>'+
+  '</section>'+
+
+  '</div><aside class="summary reveal"><div class="shead"><h2>Order Summary</h2></div>'+
+  '<div class="sitems">'+cart.map(function(i,ix){
+    return '<div class="sitem"><div class="sthumb">'+teeSvg(TEES[ix%TEES.length])+'<span class="sqty">'+i.qty+'</span></div>'+
+      '<div class="sinfo"><div class="n">'+esc(i.name)+'</div><div class="m">'+(i.size?'Size '+esc(i.size)+' · ':'')+tk(i.price)+' each</div></div>'+
+      '<div class="sprice">'+tk(i.price*i.qty)+'</div></div>';
+  }).join('')+'</div>'+
+  '<div class="stotals">'+
+    '<div class="srow"><span>Subtotal</span><span class="amount" id="sumSub">'+tk(subtotal)+'</span></div>'+
+    '<div class="srow"><span>Delivery</span><span class="amount" id="sumDel">—</span></div>'+
+    '<div class="srow total"><span>Total</span><span class="amount" id="sumTotal">—</span></div>'+
+    '<div class="paybadges"><span class="pb bkash">bKash</span><span class="pb nagad">Nagad</span><span class="pb cod">Cash on Delivery</span></div>'+
+  '</div></aside></div>';
+
+  /* Floating labels */
+  document.querySelectorAll('.field input,.field textarea').forEach(function(el){
+    el.addEventListener('input',function(){
+      el.classList.toggle('filled',el.value.trim()!=='');
+      el.closest('.field').classList.remove('error');
+    });
+    el.addEventListener('blur',function(){el.classList.toggle('filled',el.value.trim()!=='');});
+  });
+
+  /* Delivery area */
+  var fee=80;
+  function flash(el){el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');}
+  function updateTotals(){
+    var f=subtotal>=2000?0:fee;
+    var d=document.getElementById('sumDel'),t=document.getElementById('sumTotal');
+    d.innerHTML=f===0?'<span class="free">Free</span>':tk(f);
+    t.textContent=tk(subtotal+f);
+    flash(d);flash(t);
+  }
+  document.getElementById('areas').addEventListener('change',function(e){
+    fee=+e.target.value;
+    document.querySelectorAll('.area').forEach(function(a){
+      a.classList.toggle('sel',a.querySelector('input').checked);
+    });
+    updateTotals();
+  });
+  updateTotals();
+
+  /* Payment cards */
+  var payMethod='cod';
+  var bkpanel=document.getElementById('bkpanel');
+  document.querySelectorAll('.pay').forEach(function(card){
+    function pick(){
+      document.querySelectorAll('.pay').forEach(function(c){c.classList.remove('sel');});
+      card.classList.add('sel');
+      payMethod=card.dataset.pay;
+      bkpanel.classList.toggle('open',payMethod==='bkash');
+    }
+    card.addEventListener('click',pick);
+    card.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}});
+  });
+
+  /* Validation + success */
+  var phoneRe=/^01[3-9]\d{8}$/;
+  function bad(id){var f=document.getElementById(id);f.classList.add('error');return f;}
+  document.getElementById('placeBtn').addEventListener('click',function(){
+    var ok=true,first=null;
+    document.querySelectorAll('.field.error').forEach(function(f){f.classList.remove('error');});
+    if(!document.getElementById('name').value.trim()){ok=false;first=first||bad('f-name');}
+    if(!phoneRe.test(document.getElementById('phone').value.trim())){ok=false;first=first||bad('f-phone');}
+    if(!document.getElementById('addr').value.trim()){ok=false;first=first||bad('f-addr');}
+    if(payMethod==='bkash'){
+      if(!phoneRe.test(document.getElementById('bknum').value.trim())){ok=false;first=first||bad('f-bknum');}
+      if(!document.getElementById('bktrx').value.trim()){ok=false;first=first||bad('f-bktrx');}
+    }
+    if(!ok){first.scrollIntoView({behavior:'smooth',block:'center'});return;}
+
+    var d=new Date();
+    var ds=''+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+    var rnd=String(1000+Math.floor(Math.random()*9000));
+    document.getElementById('orderNum').textContent='#LX-'+ds+'-'+rnd;
+    document.getElementById('successPay').textContent='Payment: '+(payMethod==='bkash'?'bKash (Transaction '+document.getElementById('bktrx').value.trim()+')':'Cash on Delivery');
+    var f=subtotal>=2000?0:fee;
+    document.getElementById('successTotal').textContent='Total: '+tk(subtotal+f)+(f===0?' · Free delivery':' · Delivery '+tk(f));
+    document.getElementById('success').classList.add('show');
+    document.body.style.overflow='hidden';
+
+    localStorage.removeItem('luxe_cart');
+    document.getElementById('cartCount').textContent='0';
+  });
+
+  observeReveals(); headerFx();
+
+  /* Shared helpers */
+  function headerFx(){
+    var header=document.getElementById('header');
+    window.addEventListener('scroll',function(){header.classList.toggle('scrolled',window.scrollY>8);},{passive:true});
+  }
+  function observeReveals(){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e,i){
+        if(e.isIntersecting){
+          e.target.style.transitionDelay=(Math.min(i,6)*90)+'ms';
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    },{threshold:.08});
+    document.querySelectorAll('.reveal:not(.in)').forEach(function(el){io.observe(el);});
+  }
+})();
+</script>

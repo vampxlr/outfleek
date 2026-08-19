@@ -1,0 +1,22 @@
+ % Coverage report from v8
+---------------|---------|----------|---------|---------|-------------------
+File           | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+---------------|---------|----------|---------|---------|-------------------
+All files      |   98.63 |    98.24 |   96.42 |   98.38 |
+ cart.ts       |   96.15 |     90.9 |   94.11 |   95.45 | 59
+---------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 98.63% ( 72/73 )
+Branches     : 98.24% ( 56/57 )
+Functions    : 96.42% ( 27/28 )
+Lines        : 98.38% ( 61/62 )
+================================================================================
+
+Note: lib/pricing.ts and lib/validation.ts are each at 100% statements,
+branches, functions, and lines (v8's text reporter omits fully-covered files
+from the table; see coverage/coverage-summary.json for the per-file figures):
+
+lib/pricing.ts    — Statements 100% (20/20), Branches 100% (14/14), Functions 100% (6/6), Lines 100% (15/15)
+lib/validation.ts — Statements 100% (27/27), Branches 100% (32/32), Functions 100% (5/5), Lines 100% (25/25)
+lib/cart.ts        — Statements 96.15% (25/26), Branches 90.9% (10/11), Functions 94.11% (16/17), Lines 95.45% (21/22) — uncovered: setDrawer (line 59)

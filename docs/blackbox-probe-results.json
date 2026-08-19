@@ -1,0 +1,74 @@
+[
+  {
+    "id": "BB-API-01",
+    "scenario": "Place order with malformed phone (011...)",
+    "expected": "Rejected with 'Invalid phone number'",
+    "actual": "Rejected: [Request ID: 7d8bb77cdfcee1b9] Server Error"
+  },
+  {
+    "id": "BB-API-02",
+    "scenario": "Place order with empty cart",
+    "expected": "Rejected with 'Cart is empty'",
+    "actual": "Rejected: [Request ID: 5f8a82abe7406b02] Server Error"
+  },
+  {
+    "id": "BB-API-03",
+    "scenario": "Order quantity greater than available stock",
+    "expected": "Rejected with 'Out of stock'",
+    "actual": "Rejected: [Request ID: d121d26d2266fe60] Server Error"
+  },
+  {
+    "id": "BB-API-04",
+    "scenario": "Order a size that does not exist (XXXL)",
+    "expected": "Rejected with 'Variant unavailable'",
+    "actual": "Rejected: [Request ID: 45e0316cf8339b9e] Server Error"
+  },
+  {
+    "id": "BB-API-05",
+    "scenario": "Validate a promo code that does not exist",
+    "expected": "valid:false, reason 'Invalid code'",
+    "actual": "Resolved: {\"reason\":\"Invalid code\",\"valid\":false}"
+  },
+  {
+    "id": "BB-API-06",
+    "scenario": "Track an order with a wrong phone number",
+    "expected": "Returns null (no data leak)",
+    "actual": "Resolved: null"
+  },
+  {
+    "id": "BB-API-07",
+    "scenario": "Call an admin-only query with no valid session token",
+    "expected": "Rejected with 'Unauthorized'",
+    "actual": "Rejected: [Request ID: a56fc3fd61a04fa5] Server Error"
+  },
+  {
+    "id": "BB-API-08",
+    "scenario": "Create landing page with an invalid slug (spaces/uppercase)",
+    "expected": "Rejected (slug rule or Unauthorized first)",
+    "actual": "Rejected: [Request ID: b39ed098107408bd] Server Error"
+  },
+  {
+    "id": "BB-API-09",
+    "scenario": "Read public settings — must NOT expose the CAPI secret token",
+    "expected": "Object without 'capiToken' key",
+    "actual": "Resolved: {\"hasCapiToken\":false,\"storeName\":\"Outfleek\"}"
+  },
+  {
+    "id": "BB-API-10",
+    "scenario": "Fetch a published landing page by slug",
+    "expected": "Returns page with product + sections",
+    "actual": "Resolved: {\"slug\":\"noir-bloom-offer\",\"status\":\"published\",\"price\":1290,\"sections\":8}"
+  },
+  {
+    "id": "BB-API-11",
+    "scenario": "Fetch an unpublished/nonexistent landing page",
+    "expected": "Returns null",
+    "actual": "Resolved: null"
+  },
+  {
+    "id": "BB-API-12",
+    "scenario": "Save abandoned checkout with invalid phone (should be silently ignored)",
+    "expected": "Returns null, nothing stored",
+    "actual": "Resolved: null"
+  }
+]

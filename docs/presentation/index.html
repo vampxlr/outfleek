@@ -1,0 +1,751 @@
+<title>Outfleek — Project Defense</title>
+<style>
+  :root{
+    --bg1:#1e1b4b; --bg2:#4c1d95; --bg3:#0f172a;
+    --glass-bg: rgba(255,255,255,0.08);
+    --glass-bg-strong: rgba(255,255,255,0.14);
+    --glass-border: rgba(255,255,255,0.22);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.45);
+    --text: #f4f2ff;
+    --text-dim: rgba(244,242,255,0.72);
+    --text-dimmer: rgba(244,242,255,0.5);
+    --accent: #a78bfa;
+    --accent2: #f472b6;
+    --accent3: #34d399;
+    --accent4: #fbbf24;
+    --danger:#f87171;
+    --radius: 22px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    width:100%; height:100%; overflow:hidden;
+    font-family: -apple-system, "Segoe UI Variable", "Segoe UI", system-ui, Roboto, Helvetica, Arial, sans-serif;
+    color:var(--text);
+    background: radial-gradient(1200px 800px at 10% 10%, var(--bg2), transparent),
+                radial-gradient(1200px 900px at 90% 90%, var(--bg1), transparent),
+                linear-gradient(160deg, var(--bg3), #1e1140 60%, var(--bg1));
+    background-color:#0f0c29;
+  }
+  .blobs{position:fixed; inset:0; z-index:0; overflow:hidden; filter:blur(70px); opacity:.55;}
+  .blob{position:absolute; border-radius:50%; will-change:transform;}
+  .blob1{width:44vw;height:44vw; left:-10%; top:-10%; background:#7c3aed; animation:drift1 34s ease-in-out infinite;}
+  .blob2{width:38vw;height:38vw; right:-8%; top:5%; background:#db2777; animation:drift2 40s ease-in-out infinite;}
+  .blob3{width:40vw;height:40vw; left:20%; bottom:-18%; background:#059669; animation:drift3 46s ease-in-out infinite;}
+  .blob4{width:30vw;height:30vw; right:15%; bottom:-10%; background:#2563eb; animation:drift4 38s ease-in-out infinite;}
+  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(8vw,10vh) scale(1.15);}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-9vw,8vh) scale(0.9);}}
+  @keyframes drift3{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(6vw,-9vh) scale(1.1);}}
+  @keyframes drift4{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-7vw,-6vh) scale(1.2);}}
+
+  .deck{position:fixed; inset:0; z-index:1;}
+  .slide{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    padding: 64px 6vw 90px;
+    opacity:0; pointer-events:none;
+    transform: translateX(60px) scale(.94) rotateY(-6deg);
+    transition: opacity .6s cubic-bezier(.22,.9,.32,1), transform .6s cubic-bezier(.22,.9,.32,1);
+    perspective: 1400px;
+  }
+  .slide.prev{ transform: translateX(-60px) scale(.94) rotateY(6deg); opacity:0;}
+  .slide.active{ opacity:1; pointer-events:auto; transform: translateX(0) scale(1) rotateY(0deg); z-index:2;}
+  .slide-inner{ width:100%; max-width:1280px; max-height:100%; overflow-y:auto; overflow-x:hidden; padding: 4px 10px 20px;}
+  .slide-inner::-webkit-scrollbar{width:8px;}
+  .slide-inner::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2); border-radius:8px;}
+
+  .glass{
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.18);
+  }
+  .panel{ padding: 28px 34px; }
+
+  .reveal{ opacity:0; transform: translateY(22px); transition: opacity .55s ease, transform .55s ease; }
+  .slide.active .reveal{ opacity:1; transform:translateY(0); }
+  .slide.active .r1{transition-delay:.05s;} .slide.active .r2{transition-delay:.14s;}
+  .slide.active .r3{transition-delay:.23s;} .slide.active .r4{transition-delay:.32s;}
+  .slide.active .r5{transition-delay:.41s;} .slide.active .r6{transition-delay:.50s;}
+  .slide.active .r7{transition-delay:.59s;} .slide.active .r8{transition-delay:.68s;}
+  .slide.active .r9{transition-delay:.77s;} .slide.active .r10{transition-delay:.86s;}
+  .slide.active .r11{transition-delay:.95s;} .slide.active .r12{transition-delay:1.04s;}
+
+  h1{font-size: clamp(30px,4vw,52px); font-weight:800; letter-spacing:-.02em; line-height:1.05;
+     background:linear-gradient(90deg,#fff,var(--accent) 60%,var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  h2{font-size: clamp(22px,2.6vw,34px); font-weight:800; letter-spacing:-.01em; margin-bottom:14px; color:#fff;}
+  h3{font-size:18px; font-weight:700; margin-bottom:6px;}
+  p, li{font-size:15.5px; line-height:1.55; color:var(--text-dim);}
+  .kicker{ text-transform:uppercase; letter-spacing:.18em; font-size:12px; font-weight:700; color:var(--accent);}
+  .lead{font-size:17px; color:var(--text-dim); margin-top:10px; max-width:64ch;}
+  ul{padding-left:20px;} li{margin-bottom:8px;}
+  .grid{display:grid; gap:18px;}
+  .g2{grid-template-columns:1fr 1fr;} .g3{grid-template-columns:repeat(3,1fr);} .g4{grid-template-columns:repeat(4,1fr);}
+  @media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr 1fr;}}
+  .card{padding:18px 20px;}
+  .badge{display:inline-block; padding:3px 12px; border-radius:100px; font-size:11px; font-weight:700; letter-spacing:.04em; background:rgba(255,255,255,.12); border:1px solid var(--glass-border);}
+  .tag{color:var(--accent3);}
+  .mono{font-family:"Cascadia Code","Consolas",monospace; font-size:13px; background:rgba(0,0,0,.28); padding:2px 8px; border-radius:6px;}
+
+  /* top progress bar */
+  #topbar{position:fixed; top:0; left:0; right:0; height:4px; z-index:50; background:rgba(255,255,255,.08);}
+  #topfill{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3)); transition:width .5s ease;}
+
+  /* footer */
+  #footer{position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex; align-items:center; justify-content:space-between;
+    padding:10px 22px; gap:14px;}
+  #footer .glass{padding:8px 16px; display:flex; align-items:center; gap:10px; font-size:13px;}
+  #dots{display:flex; gap:6px; flex-wrap:wrap; max-width:44vw;}
+  .dot{width:8px;height:8px;border-radius:50%; background:rgba(255,255,255,.28); cursor:pointer; transition:.25s;}
+  .dot.active{background:var(--accent); width:22px; border-radius:6px;}
+  .dot.p2{ }
+  .navbtn{width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:18px; user-select:none;}
+  .navbtn:hover{background:var(--glass-bg-strong);}
+  #timer{font-variant-numeric:tabular-nums; font-weight:700;}
+  #timer.amber{color:var(--accent4);} #timer.red{color:var(--danger); animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+  /* speaker notes overlay */
+  #notes{position:fixed; inset:0; z-index:80; display:none; align-items:flex-end; justify-content:center; padding:40px;}
+  #notes.show{display:flex;}
+  #notes .panel{max-width:820px; width:100%; max-height:60vh; overflow:auto;}
+  #notes h3{color:var(--accent4);}
+  #notes ul{margin-top:8px;}
+
+  #helpToast{position:fixed; top:16px; right:16px; z-index:90; font-size:12px; padding:8px 14px; opacity:.85;}
+
+  /* generic component styles */
+  .flow{display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;}
+  .node{padding:16px 20px; text-align:center; min-width:130px;}
+  .arrow{font-size:22px; color:var(--accent); animation:arrowpulse 1.6s infinite;}
+  @keyframes arrowpulse{0%,100%{opacity:.4;}50%{opacity:1;}}
+
+  .counter{font-size:44px; font-weight:800; background:linear-gradient(90deg,var(--accent3),var(--accent)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .barwrap{background:rgba(255,255,255,.1); border-radius:100px; height:14px; overflow:hidden; margin-top:8px;}
+  .barfill{height:100%; border-radius:100px; width:0%; background:linear-gradient(90deg,var(--accent3),var(--accent)); transition:width 1.4s cubic-bezier(.22,.9,.32,1);}
+
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  th,td{padding:8px 10px; text-align:left; border-bottom:1px solid rgba(255,255,255,.12);}
+  th{color:var(--accent); font-size:11.5px; text-transform:uppercase; letter-spacing:.06em;}
+  tr.pass td:first-child::before{content:"✓ "; color:var(--accent3);}
+  tr.fail td:first-child::before{content:"✕ "; color:var(--danger);}
+
+  .shot{aspect-ratio:16/10; border-radius:14px; overflow:hidden; position:relative; background:rgba(0,0,0,.25); border:1px solid var(--glass-border);}
+  .shot img{width:100%; height:100%; object-fit:cover; object-position:top;}
+  .shot .cap{position:absolute; left:0; right:0; bottom:0; padding:6px 10px; font-size:11.5px; background:linear-gradient(0deg,rgba(0,0,0,.65),transparent); }
+  .shot.missing img{display:none;}
+  .shot.missing::after{content:attr(data-label); position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:10px; font-size:12px; color:var(--text-dimmer); border:1px dashed rgba(255,255,255,.25);}
+
+  code.small{font-size:12px;}
+  .split{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media (max-width:900px){.split{grid-template-columns:1fr;}}
+
+  svg text{fill:var(--text); font-family:inherit;}
+  .cfgpath{fill:none; stroke-width:3; stroke-linecap:round;}
+</style>
+
+<div class="blobs"><div class="blob blob1"></div><div class="blob blob2"></div><div class="blob blob3"></div><div class="blob blob4"></div></div>
+
+<div id="topbar"><div id="topfill"></div></div>
+
+<div class="deck" id="deck"></div>
+
+<div id="footer">
+  <div class="glass" style="display:flex;align-items:center;gap:10px;">
+    <div class="navbtn" onclick="go(-1)">‹</div>
+    <span id="presenterLabel" style="font-weight:700;"></span>
+    <span style="opacity:.5">•</span>
+    <span id="slideCount"></span>
+    <div class="navbtn" onclick="go(1)">›</div>
+  </div>
+  <div id="dots" class="glass" style="padding:8px 14px;"></div>
+  <div class="glass" id="timerPill">⏱ <span id="timer">00:00</span></div>
+</div>
+
+<div id="notes">
+  <div class="glass panel">
+    <div class="kicker">Speaker notes (press N to close)</div>
+    <h3 id="notesTitle"></h3>
+    <ul id="notesList"></ul>
+  </div>
+</div>
+
+<div id="helpToast" class="glass">← → Space navigate · N notes · T timer · R reset · F fullscreen · 1-9 jump</div>
+
+<script>
+/* ============ EDIT PRESENTER INFO HERE ============ */
+const PRESENTER_1 = { name:"Shazidul Islam Suvo", roll:"23", part:"Part 1: The Product & The Architecture", slides:11 };
+const PRESENTER_2 = { name:"Rahimur Rahman Rahim", roll:"25", part:"Part 2: Testing & Quality Assurance", slides:11 };
+/* ==================================================== */
+
+const SHOT = (name,label)=>`<div class="shot" data-label="${label}"><img src="../screenshots/${name}" alt="${label}" onerror="this.closest('.shot').classList.add('missing')"><div class="cap">${label}</div></div>`;
+
+const SLIDES = [
+// ---------------- PART 1 ----------------
+{presenter:1, html:`
+  <div class="glass panel" style="text-align:center; padding:60px 50px;">
+    <div class="kicker reveal r1">Software Testing & Quality Assurance Lab · 0613-308</div>
+    <h1 class="reveal r2" style="margin-top:14px;">Outfleek</h1>
+    <p class="lead reveal r3" style="margin:16px auto;">A production e-commerce platform built for the Bangladeshi market — storefront, admin panel, and Facebook-ad landing-page builder in one Next.js + Convex codebase.</p>
+    <div class="grid g2 reveal r4" style="max-width:640px;margin:26px auto 0;">
+      <div class="glass card"><h3>${PRESENTER_1.name}</h3><p>Roll ${PRESENTER_1.roll} — ${PRESENTER_1.part}</p></div>
+      <div class="glass card"><h3>${PRESENTER_2.name}</h3><p>Roll ${PRESENTER_2.roll} — ${PRESENTER_2.part}</p></div>
+    </div>
+    <p class="reveal r5" style="margin-top:22px; font-size:13px; color:var(--text-dimmer);">Dhaka International University · Submitted to Md. Didar Ahmed, Lecturer · Group 4</p>
+  </div>`,
+  notes:["Welcome the audience and course instructor.","State the project name and one-sentence pitch: a real, deployed BD e-commerce platform.","Introduce both presenters and the two-part split (product/architecture, then testing/QA).","Mention it's live and open-source — repo + live URL come at the end.","Set expectations: 10 minutes each, ~20 total."]},
+
+{presenter:1, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">02 · The Problem</div>
+    <h2 class="reveal r2">Selling online in Bangladesh is still broken</h2>
+    <div class="grid g2" style="margin-top:10px;">
+      <div class="glass card reveal r3"><h3>📘 Facebook-page-only selling</h3><p>Most small sellers take orders through Messenger comments/DMs — no real storefront, no catalog, no cart.</p></div>
+      <div class="glass card reveal r4"><h3>💵 No COD-friendly checkout</h3><p>Off-the-shelf carts assume card payment. Bangladesh runs on Cash on Delivery and manual bKash — rarely supported well.</p></div>
+      <div class="glass card reveal r5"><h3>📉 No ad tracking</h3><p>Sellers boost posts blind — no Pixel, no server-side events, no idea which ad actually converts.</p></div>
+      <div class="glass card reveal r6"><h3>📋 Manual order handling</h3><p>Orders tracked in spreadsheets or notebooks; no status workflow, no abandoned-checkout recovery, no invoices.</p></div>
+    </div>
+    <p class="lead reveal r7" style="margin-top:16px;">Outfleek exists to fix all four at once — for a real seller, with a real product line.</p>
+  </div>`,
+  notes:["Frame the local context: BD sellers largely operate through Facebook pages, not proper stores.","COD dominates payment — most platforms are built card-first and don't fit.","Ad spend is wasted without pixel/CAPI tracking — sellers can't tell which ad works.","Order management is manual — no workflow, no recovery of abandoned checkouts.","Transition: 'so we built a platform that solves all four.'"]},
+
+{presenter:1, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">03 · The Solution</div>
+    <h2 class="reveal r2">One codebase, three surfaces</h2>
+    <div class="grid g3" style="margin-top:6px;">
+      <div class="glass card reveal r3"><div class="badge">Surface 1</div><h3 style="margin-top:10px;">Storefront</h3><p>Home = product listing, product detail with variants/stock, cart drawer, checkout with COD + bKash, order tracking.</p></div>
+      <div class="glass card reveal r4"><div class="badge">Surface 2</div><h3 style="margin-top:10px;">Admin Panel</h3><p>Dashboard, order workflow + bKash verification, product/category/promo CRUD, abandoned-checkout call list, settings.</p></div>
+      <div class="glass card reveal r5"><div class="badge">Surface 3</div><h3 style="margin-top:10px;">Landing-Page Builder</h3><p>One-page Facebook-ad funnels at <span class="mono">/l/&lt;slug&gt;</span> — 8 toggleable sections + inline order form.</p></div>
+    </div>
+    <p class="lead reveal r6" style="margin-top:18px;">Built with Next.js 15 App Router + TypeScript on top of Convex for backend, database, file storage and scheduling — deployed on Vercel + Convex Cloud.</p>
+  </div>`,
+  notes:["Introduce the three-surface architecture as the core pitch.","Storefront: home page doubles as the listing — no separate catalog page needed.","Admin: full operational control, not just a CMS — order workflow, bKash verification, invoices.","Landing builder is the standout feature — teased here, detailed later in slide 10.","Name the stack briefly; full breakdown is next slide."]},
+
+{presenter:1, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">04 · Tech Stack</div>
+    <h2 class="reveal r2">Why these tools</h2>
+    <div class="grid g4" style="margin-top:6px;">
+      <div class="glass card reveal r3"><h3>Next.js 15</h3><p>App Router, server components, one deploy for storefront + admin + landing pages.</p></div>
+      <div class="glass card reveal r4"><h3>TypeScript</h3><p>End-to-end types from DB schema to UI — catches pricing/shape bugs at compile time.</p></div>
+      <div class="glass card reveal r5"><h3>Convex</h3><p>Backend, database, file storage and scheduler in one reactive platform — no separate API layer.</p></div>
+      <div class="glass card reveal r6"><h3>Framer Motion</h3><p>Cart drawer slide-ins, gallery transitions, micro-interactions that feel native.</p></div>
+      <div class="glass card reveal r7"><h3>Tailwind CSS v4</h3><p>Fast, consistent styling across three very different surfaces.</p></div>
+      <div class="glass card reveal r8"><h3>Zustand</h3><p>Lightweight client state for cart/UI without Redux boilerplate.</p></div>
+      <div class="glass card reveal r9"><h3>Vercel</h3><p>Zero-config edge deploys, previews per PR.</p></div>
+      <div class="glass card reveal r10"><h3>Convex Cloud</h3><p>Managed realtime backend — mutations, queries, scheduled jobs, storage.</p></div>
+    </div>
+  </div>`,
+  notes:["Walk the grid left to right — one breath per card, don't over-explain.","Emphasize Convex as the unusual choice: replaces API routes + DB + cron with one system.","TypeScript end-to-end is a QA point you'll reference again in Part 2 (testability).","Framer Motion for the cart drawer/gallery — visual polish, not just structure.","Close: 'all of this deploys as two connected services — Vercel and Convex Cloud.'"]},
+
+{presenter:1, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">05 · Architecture</div>
+    <h2 class="reveal r2">Request flow, end to end</h2>
+    <svg viewBox="0 0 900 220" style="width:100%;height:auto;margin-top:10px;" id="archsvg">
+      <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#a78bfa"/></marker></defs>
+      <g font-size="14" font-weight="700">
+        <rect x="10" y="80" width="150" height="60" rx="14" fill="rgba(167,139,250,.18)" stroke="#a78bfa"/>
+        <text x="85" y="105" text-anchor="middle">Browser</text><text x="85" y="123" text-anchor="middle" font-size="11" opacity=".7">Customer / Admin</text>
+
+        <rect x="255" y="80" width="170" height="60" rx="14" fill="rgba(244,114,182,.18)" stroke="#f472b6"/>
+        <text x="340" y="105" text-anchor="middle">Next.js 15</text><text x="340" y="123" text-anchor="middle" font-size="11" opacity=".7">App Router · Vercel</text>
+
+        <rect x="520" y="80" width="170" height="60" rx="14" fill="rgba(52,211,153,.18)" stroke="#34d399"/>
+        <text x="605" y="105" text-anchor="middle">Convex</text><text x="605" y="123" text-anchor="middle" font-size="11" opacity=".7">DB · Storage · Scheduler</text>
+
+        <rect x="750" y="80" width="140" height="60" rx="14" fill="rgba(251,191,36,.18)" stroke="#fbbf24"/>
+        <text x="820" y="105" text-anchor="middle">Meta CAPI</text><text x="820" y="123" text-anchor="middle" font-size="11" opacity=".7">scheduled event</text>
+
+        <path d="M160,110 L253,110" stroke="#a78bfa" stroke-width="2.5" marker-end="url(#arrow)" class="flowline"/>
+        <path d="M425,110 L518,110" stroke="#f472b6" stroke-width="2.5" marker-end="url(#arrow)" class="flowline"/>
+        <path d="M690,110 L748,110" stroke="#34d399" stroke-width="2.5" marker-end="url(#arrow)" class="flowline"/>
+      </g>
+    </svg>
+    <div class="grid g3 reveal r4" style="margin-top:6px;">
+      <div class="glass card"><p><b>1.</b> Browser renders storefront/admin pages and fires the client Meta Pixel.</p></div>
+      <div class="glass card"><p><b>2.</b> Next.js server actions call Convex mutations/queries — prices always recomputed server-side.</p></div>
+      <div class="glass card"><p><b>3.</b> Convex schedules a server-side CAPI Purchase event — never blocks the order on Meta's uptime.</p></div>
+    </div>
+  </div>
+  <style>.flowline{stroke-dasharray:14; animation:dash 1.2s linear infinite;} @keyframes dash{to{stroke-dashoffset:-28;}}</style>`,
+  notes:["Draw the arrow left to right as you talk: browser, Next.js, Convex, Meta CAPI.","Emphasize this is a single connected pipeline, not four separate systems glued together.","Highlight: pricing is recomputed server-side in Convex — foreshadow the testing section.","CAPI call is scheduled (async), not awaited — a Meta outage never blocks checkout.","This diagram sets up slide 11's pixel/CAPI dedup deep-dive."]},
+
+{presenter:1, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">06 · Data Model</div>
+    <h2 class="reveal r2">Convex tables</h2>
+    <div class="grid g3" style="margin-top:6px;">
+      <div class="glass card reveal r3" style="border:1px solid var(--accent);"><h3>products <span class="badge">core</span></h3><p>name, price, images[], categoryId, <span class="mono">variants[]</span> (size × colour × stock)</p><p style="font-size:12px;color:var(--text-dimmer)">indexes: by_category, by_slug</p></div>
+      <div class="glass card reveal r4" style="border:1px solid var(--accent);"><h3>orders <span class="badge">core</span></h3><p>items[], customer, deliveryArea, status, paymentMethod, bkashTxId, promoCode</p><p style="font-size:12px;color:var(--text-dimmer)">indexes: by_status, by_phone, by_createdAt</p></div>
+      <div class="glass card reveal r5"><h3>categories</h3><p>name, slug, sortOrder</p></div>
+      <div class="glass card reveal r6"><h3>promoCodes</h3><p>code, type (flat/percent), minSubtotal, expiry</p></div>
+      <div class="glass card reveal r7"><h3>landingPages</h3><p>slug, sections[] (JSON), theme, isPublished</p></div>
+      <div class="glass card reveal r8"><h3>settings</h3><p>delivery fees, thresholds, bKash number, feature flags</p></div>
+      <div class="glass card reveal r9"><h3>trackingEvents</h3><p>event_id, pixelSent, capiSent, retryCount</p></div>
+      <div class="glass card reveal r10"><h3>abandonedCheckouts</h3><p>partial contact info, called flag, notes</p></div>
+    </div>
+  </div>`,
+  notes:["Products and orders are the two core tables — highlighted with the accent border.","Products: note the variants[] array holds size × colour × stock — this feeds the stock-check logic tested in Part 2.","Orders: indexed by status, phone, and createdAt for the admin dashboard's filters.","trackingEvents table is what makes the Pixel/CAPI dedup possible — one event_id shared by both.","Keep this brief — it's a reference slide, not a deep dive."]},
+
+{presenter:1, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">07 · Storefront Walkthrough</div>
+    <h2 class="reveal r2">Browsing and product detail</h2>
+    <div class="grid g3">
+      <div class="reveal r3">${SHOT('01-home-listing.png','Home = product listing')}</div>
+      <div class="reveal r4">${SHOT('02-home-mobile.png','Mobile responsive listing')}</div>
+      <div class="reveal r5">${SHOT('03-product-detail.png','Product detail — gallery + variants')}</div>
+      <div class="reveal r6">${SHOT('04-cart-drawer.png','Slide-in cart drawer')}</div>
+      <div class="reveal r7">${SHOT('05-cart-page.png','Cart — promo code + free delivery bar')}</div>
+      <div class="reveal r8 glass card" style="display:flex;align-items:center;"><p>Home page doubles as the catalog — no separate "shop" route. Cart drawer slides in with Framer Motion on every add-to-cart.</p></div>
+    </div>
+  </div>`,
+  notes:["Point out home page IS the listing — a deliberate simplification for a small catalog.","Product detail: gallery, size/colour variant picker, live stock display.","Cart drawer slides in on add-to-cart — instant feedback, no page reload.","Cart page: promo code field and the free-delivery progress bar (৳2000 threshold).","This progress bar's exact boundary logic is unit-tested — teased for Part 2."]},
+
+{presenter:1, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">08 · Checkout</div>
+    <h2 class="reveal r2">COD + manual bKash, guest-only</h2>
+    <div class="grid g2">
+      <div class="reveal r3">${SHOT('06-checkout-form.png','Checkout form')}</div>
+      <div class="reveal r4">${SHOT('08-checkout-bkash.png','bKash send-money + Transaction ID')}</div>
+      <div class="reveal r5">${SHOT('07-checkout-validation-error.png','Inline validation errors')}</div>
+      <div class="reveal r6">${SHOT('09-order-success.png','Order confirmation')}</div>
+    </div>
+    <div class="glass card reveal r7" style="margin-top:14px;">
+      <p><b>Why guest checkout?</b> BD buyers abandon carts at account creation. No login, no password — name, phone, address, and pay. bKash is manual: customer sends money, pastes the Transaction ID, admin verifies it later in the order workflow.</p>
+    </div>
+  </div>`,
+  notes:["Two payment paths: Cash on Delivery (default) and manual bKash send-money.","bKash flow: customer manually sends money to a number, then pastes the Transaction ID — no payment gateway integration needed.","Guest checkout is a conscious UX decision — forced signup kills conversion in this market.","Show the validation error screenshot — checkout form has real client + server validation (Part 2 covers the decision table).","Order success leads into order tracking, shown next in the admin section."]},
+
+{presenter:1, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">09 · Admin Panel</div>
+    <h2 class="reveal r2">Full operational control</h2>
+    <div class="grid g3">
+      <div class="reveal r3">${SHOT('14-admin-dashboard.png','Dashboard')}</div>
+      <div class="reveal r4">${SHOT('15-admin-orders.png','Orders — status workflow')}</div>
+      <div class="reveal r5">${SHOT('16-admin-order-detail.png','Order detail — bKash verify + courier + invoice')}</div>
+      <div class="reveal r6">${SHOT('17-admin-products.png','Product list')}</div>
+      <div class="reveal r7">${SHOT('18-admin-product-form.png','Product CRUD + image upload')}</div>
+      <div class="reveal r8">${SHOT('21-admin-settings.png','Runtime-configurable settings')}</div>
+    </div>
+  </div>`,
+  notes:["Dashboard gives a daily-operations overview — orders, revenue, low stock.","Orders: full status workflow (pending → confirmed → shipped → delivered/returned), bKash TxID verification, courier assignment, printable invoice.","Products: CRUD with image upload to Convex storage, or external image URLs.","Settings page: delivery fees, free-delivery threshold, bKash number — all runtime-configurable, no redeploy needed.","Mention order tracking (10-track-order.png) briefly ties admin status to what the customer sees."]},
+
+{presenter:1, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">10 · The Standout Feature</div>
+    <h2 class="reveal r2">Landing-page builder</h2>
+    <div class="grid g2">
+      <div class="reveal r3">${SHOT('20-admin-landing-builder.png','Builder — 8 toggleable sections')}</div>
+      <div class="reveal r4">${SHOT('11-landing-page.png','Rendered funnel at /l/&lt;slug&gt;')}</div>
+    </div>
+    <div class="grid g3" style="margin-top:14px;">
+      <div class="glass card reveal r5">${SHOT('19-admin-landing-list.png','Landing pages list')}</div>
+      <div class="glass card reveal r6">${SHOT('12-landing-order-form.png','Inline order form on the funnel')}</div>
+      <div class="glass card reveal r7" style="display:flex;align-items:center;"><p>A <span class="mono">sections[]</span> JSON array drives the entire rendered page — hero, features, testimonials, FAQ, and more, each toggleable, feeding one React renderer.</p></div>
+    </div>
+  </div>`,
+  notes:["This is the standout feature: sellers build a Facebook-ad funnel without touching code.","Admin picks a slug, toggles from 8 section types (hero, benefits, testimonials, FAQ, etc.), publishes.","Data-driven rendering: one React component reads the sections[] JSON and renders in order — no per-page code.","The funnel has its own inline order form — separate conversion path from the main storefront.","This is where Pixel + CAPI tracking matters most — ad traffic lands here, which leads into the next slide."]},
+
+{presenter:1, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">11 · Meta Pixel + CAPI</div>
+    <h2 class="reveal r2">One event_id, two senders, zero double-counting</h2>
+    <svg viewBox="0 0 900 260" style="width:100%;height:auto;" id="capidiagram">
+      <g font-size="13" font-weight="700">
+        <rect x="20" y="20" width="180" height="56" rx="14" fill="rgba(167,139,250,.18)" stroke="#a78bfa"/>
+        <text x="110" y="53" text-anchor="middle">Browser Pixel</text>
+        <rect x="20" y="180" width="180" height="56" rx="14" fill="rgba(52,211,153,.18)" stroke="#34d399"/>
+        <text x="110" y="213" text-anchor="middle">Server (Convex)</text>
+        <rect x="680" y="100" width="200" height="60" rx="14" fill="rgba(251,191,36,.2)" stroke="#fbbf24"/>
+        <text x="780" y="126" text-anchor="middle">Meta</text>
+        <text x="780" y="144" text-anchor="middle" font-size="11" font-weight="400" opacity=".8">dedupes by event_id</text>
+        <text x="450" y="30" text-anchor="middle" font-size="12" font-weight="400" fill="#f472b6">event_id: "purchase_9f8a..."</text>
+      </g>
+      <circle id="pkt1" r="9" fill="#a78bfa"/>
+      <circle id="pkt2" r="9" fill="#34d399"/>
+      <circle id="merge" r="0" fill="#fbbf24" cx="780" cy="130"/>
+    </svg>
+    <div class="grid g3 reveal r4" style="margin-top:8px;">
+      <div class="glass card"><p><b>Client:</b> Pixel fires instantly on Purchase, tagged with a shared event_id.</p></div>
+      <div class="glass card"><p><b>Server:</b> Convex schedules the same event server-side with SHA-256 hashed PII and fbclid→_fbc.</p></div>
+      <div class="glass card"><p><b>Meta:</b> merges both by event_id — one conversion counted, best of both signal qualities.</p></div>
+    </div>
+  </div>
+  <style>
+  #capidiagram circle{opacity:0;}
+  .slide.active #capidiagram circle{animation: travel 2.6s cubic-bezier(.4,0,.2,1) infinite;}
+  @keyframes travel{
+    0%{opacity:0;}
+    3%{opacity:1;}
+    45%{opacity:1;}
+    50%{opacity:0;}
+    100%{opacity:0;}
+  }
+  </style>`,
+  notes:["Explain the deduplication problem: browser Pixel + server CAPI both send Purchase — without a shared ID, Meta counts it twice.","The fix: ONE event_id generated once, used by both the client pixel call and the server CAPI call.","Server side adds SHA-256 hashed PII (email/phone) and fbclid→_fbc capture for better match quality.","Meta merges any two events sharing an event_id into a single conversion — best of both worlds.","This closes Part 1 — hand off to Rahim for testing & QA."]},
+
+// ---------------- PART 2 ----------------
+{presenter:2, html:`
+  <div class="glass panel" style="text-align:center; padding:60px 50px;">
+    <div class="kicker reveal r1">Part 2</div>
+    <h1 class="reveal r2" style="margin-top:10px;">Testing & Quality Assurance</h1>
+    <p class="lead reveal r3" style="margin:16px auto;">How we proved Outfleek's core logic is correct — black box and white box, unit through system.</p>
+    <div class="glass card reveal r4" style="max-width:420px;margin:26px auto 0;"><h3>${PRESENTER_2.name}</h3><p>Roll ${PRESENTER_2.roll}</p></div>
+  </div>`,
+  notes:["Quick handover moment — thank Suvo, restate the pivot from product to QA.","Preview the arc: why testing matters → strategy → black box → white box → coverage → conclusion.","Keep this slide under 20 seconds — it's a transition, not new content."]},
+
+{presenter:2, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">13 · Why Testing Matters</div>
+    <h2 class="reveal r2">A pricing bug is real money lost</h2>
+    <div class="split">
+      <div class="glass card reveal r3" style="border:1px solid var(--danger);">
+        <h3 style="color:var(--danger)">❌ Naive approach</h3>
+        <p>Client sends the price shown on screen. Trust it.</p>
+        <p class="mono" style="display:block;margin-top:8px;">POST /order { price: 1200 }</p>
+        <p style="margin-top:8px;">A malicious buyer edits the request and pays ৳1.</p>
+      </div>
+      <div class="glass card reveal r4" style="border:1px solid var(--accent3);">
+        <h3 style="color:var(--accent3)">✅ Outfleek's approach</h3>
+        <p>Client sends only productId + variant. Server recomputes the price from lib/pricing.ts.</p>
+        <p class="mono" style="display:block;margin-top:8px;">calcTotal(productId, qty) → server-trusted</p>
+        <p style="margin-top:8px;">Client-submitted prices are never trusted or stored.</p>
+      </div>
+    </div>
+    <p class="lead reveal r5" style="margin-top:14px;">This single rule — <b>never trust client prices</b> — is exactly the kind of invariant that unit tests exist to lock in permanently.</p>
+  </div>`,
+  notes:["Open with the stakes: an untested pricing bug directly costs money, not just a UI glitch.","Show the naive vs correct approach — client-forged price vs server-side recomputation.","This is a real safeguard found in the Outfleek codebase, verified during testing.","Tie it to testing philosophy: once you've proven an invariant like this once, a unit test locks it in forever against regressions.","Transition into the black box vs white box distinction."]},
+
+{presenter:2, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">14 · Two Lenses</div>
+    <h2 class="reveal r2">Black box vs white box testing</h2>
+    <div class="split">
+      <div class="glass card reveal r3">
+        <h3>⬛ Black box</h3>
+        <p>Tests behaviour from the outside — inputs in, outputs out. No knowledge of internal code.</p>
+        <ul><li>Equivalence partitioning</li><li>Boundary value analysis</li><li>Decision tables</li><li>State transition testing</li></ul>
+      </div>
+      <div class="glass card reveal r4">
+        <h3>⬜ White box</h3>
+        <p>Tests internal structure — statements, branches, and paths through the code.</p>
+        <ul><li>Statement coverage</li><li>Branch coverage</li><li>Basis path testing</li><li>Control-flow graph analysis</li></ul>
+      </div>
+    </div>
+    <p class="lead reveal r5" style="margin-top:14px;">We applied both to Outfleek: black box on user-facing flows (checkout form), white box on extracted pure-logic modules (pricing, validation).</p>
+  </div>`,
+  notes:["Define both terms cleanly and quickly — the audience needs this vocabulary for the rest of the talk.","Black box: we don't care how calcDeliveryFee works, only that ৳2000+ orders get free delivery.","White box: we DO care how it works — every branch and path gets exercised.","State clearly where each was applied in Outfleek — checkout form (black box) vs pricing/validation modules (white box).","Move into the overall test strategy / pyramid."]},
+
+{presenter:2, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">15 · Test Strategy</div>
+    <h2 class="reveal r2">The testing pyramid, applied</h2>
+    <div class="grid g3">
+      <div class="glass card reveal r3" style="text-align:center;"><h3>🔺 Unit</h3><p>81 test cases across pricing, validation, cart logic. Vitest. White box + black box combined.</p></div>
+      <div class="glass card reveal r4" style="text-align:center;"><h3>🔗 Integration</h3><p>Convex mutations (stock decrement + order insert as one atomic transaction) exercised together.</p></div>
+      <div class="glass card reveal r5" style="text-align:center;"><h3>🖥️ System / UI</h3><p>Manual end-to-end walkthroughs: checkout form validation, admin order workflow, landing-page funnel.</p></div>
+    </div>
+    <div class="glass card reveal r6" style="margin-top:14px;">
+      <p>Most rigour went into the base of the pyramid — pure business logic (pricing, delivery fee, promo codes, phone validation) was extracted so it's cheap and fast to unit test exhaustively.</p>
+    </div>
+  </div>`,
+  notes:["Introduce the classic testing pyramid shape: most tests at the unit level, fewer at integration, fewest at system/UI.","Unit level is where the 81 test cases live — this is the bulk of the rigor.","Integration: the atomic Convex mutation for stock+order was tested as a unit — critical safeguard.","System/UI: manual walkthroughs of checkout, admin workflow, and the landing funnel end-to-end.","Set up the next few slides which drill into black box technique specifics."]},
+
+{presenter:2, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">16 · Black Box</div>
+    <h2 class="reveal r2">Equivalence partitioning + decision table (checkout form)</h2>
+    <div class="glass card reveal r3">
+      <h3>Phone number partitions</h3>
+      <p><span class="tag">Valid:</span> 01XXXXXXXXX (11 digits, starts 013-019) &nbsp; <span style="color:var(--danger)">Invalid:</span> too short, wrong prefix, contains letters, +88 variants</p>
+    </div>
+    <table class="reveal r4" style="margin-top:14px;">
+      <tr><th>Name</th><th>Phone</th><th>Address</th><th>Payment</th><th>Result</th></tr>
+      <tr class="pass"><td>valid</td><td>valid</td><td>valid</td><td>COD</td><td>Order placed</td></tr>
+      <tr class="pass"><td>valid</td><td>valid</td><td>valid</td><td>bKash + TxID</td><td>Order placed</td></tr>
+      <tr class="fail"><td>valid</td><td>invalid</td><td>valid</td><td>COD</td><td>Blocked — phone error</td></tr>
+      <tr class="fail"><td>valid</td><td>valid</td><td>empty</td><td>COD</td><td>Blocked — address required</td></tr>
+      <tr class="fail"><td>valid</td><td>valid</td><td>valid</td><td>bKash, no TxID</td><td>Blocked — TxID required</td></tr>
+      <tr class="fail"><td>empty</td><td>valid</td><td>valid</td><td>COD</td><td>Blocked — name required</td></tr>
+    </table>
+  </div>`,
+  notes:["Explain equivalence partitioning: group inputs into classes expected to behave the same way, test one representative from each.","Phone number: valid partition is 11-digit numbers starting 013-019; invalid covers short, wrong-prefix, non-numeric.","Walk the decision table row by row — each row is a distinct combination of valid/invalid inputs mapped to expected result.","Point out the bKash-without-TxID row — a business rule, not just a format check.","This decision table structure is what validateCheckout() implements — connects to the complexity number in slide 19."]},
+
+{presenter:2, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">17 · Black Box</div>
+    <h2 class="reveal r2">Boundary value analysis — the ৳2000 free-delivery line</h2>
+    <table class="reveal r3">
+      <tr><th>Subtotal</th><th>Expected delivery fee</th><th>Actual result</th></tr>
+      <tr class="pass"><td>৳1999</td><td>৳80 (Dhaka) / ৳130 (outside)</td><td>Matched — fee charged</td></tr>
+      <tr class="pass"><td>৳2000</td><td>৳0 (free)</td><td>Matched — free delivery</td></tr>
+      <tr class="pass"><td>৳2001</td><td>৳0 (free)</td><td>Matched — free delivery</td></tr>
+    </table>
+    <div class="glass card reveal r4" style="margin-top:16px;">
+      <p>Boundary value analysis targets the edges of a partition, where off-by-one bugs live. ৳2000 is the threshold — testing 1999/2000/2001 catches a <span class="mono">&gt;</span> vs <span class="mono">&gt;=</span> mistake that equivalence partitioning alone would miss.</p>
+    </div>
+  </div>`,
+  notes:["Explain why boundaries matter: most bugs live at the edges of a range, not the middle.","৳1999 tests just below threshold — should still charge delivery.","৳2000 tests exactly at threshold — this is the row that would catch a > vs >= bug.","৳2001 tests just above — confirms free delivery holds beyond the boundary.","All three passed in the real test run — state that explicitly, these are real results not hypothetical."]},
+
+{presenter:2, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">18 · Black Box Execution Summary</div>
+    <h2 class="reveal r2">Modules tested</h2>
+    <table class="reveal r3">
+      <tr><th>Module</th><th>Technique</th><th>Cases</th><th>Result</th></tr>
+      <tr class="pass"><td>Checkout form validation</td><td>Equivalence partitioning + decision table</td><td>12</td><td>12/12 pass</td></tr>
+      <tr class="pass"><td>Free-delivery threshold</td><td>Boundary value analysis</td><td>3</td><td>3/3 pass</td></tr>
+      <tr class="pass"><td>Order status workflow</td><td>State transition testing</td><td>8</td><td>8/8 pass</td></tr>
+      <tr class="pass"><td>Promo code application</td><td>Equivalence partitioning</td><td>6</td><td>6/6 pass</td></tr>
+      <tr class="pass"><td>BD phone normalization</td><td>Boundary + equivalence</td><td>7</td><td>7/7 pass</td></tr>
+    </table>
+    <p class="lead reveal r4" style="margin-top:14px;">All black box scenarios pass. Full automated detail lives in the 81 unit tests covered next.</p>
+  </div>`,
+  notes:["This is a summary table rolling up the black box work from the last two slides plus a couple more modules.","State transition testing on the order status workflow: pending → confirmed → shipped → delivered/returned/cancelled, checking illegal transitions are blocked.","Promo code equivalence classes: valid code, expired code, below minSubtotal, unknown code.","Phone normalization: handles +88, 0-prefix, and 11-digit raw formats — boundary + equivalence combined.","Bridge into white box: 'that's the outside view — now let's look at what's inside.'"]},
+
+{presenter:2, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">19 · White Box</div>
+    <h2 class="reveal r2">Designing for testability</h2>
+    <div class="split">
+      <div class="glass card reveal r3" style="border:1px solid var(--danger);">
+        <h3 style="color:var(--danger)">Before</h3>
+        <p>Pricing and validation logic lived inline inside React components and Convex mutations — tangled with UI and DB calls, impossible to unit test in isolation.</p>
+      </div>
+      <div class="glass card reveal r4" style="border:1px solid var(--accent3);">
+        <h3 style="color:var(--accent3)">After</h3>
+        <p>Pure functions extracted into <span class="mono">lib/pricing.ts</span> and <span class="mono">lib/validation.ts</span> — no React, no Convex, no I/O. Same logic, callable directly from Vitest.</p>
+      </div>
+    </div>
+    <div class="glass card reveal r5" style="margin-top:14px;">
+      <p>This is the core white box design principle: <b>extract pure logic from side effects</b>. It's why 98%+ coverage on these two modules was achievable at all.</p>
+    </div>
+  </div>`,
+  notes:["Explain the before/after refactor explicitly — this is a design-for-testability story, not just a testing story.","Before: pricing logic entangled with React components/Convex mutations — untestable without mocking the whole stack.","After: pure functions in lib/pricing.ts and lib/validation.ts with no side effects — trivially unit-testable.","Emphasize this connects directly to the coverage numbers coming up — extraction is WHY 98%+ was achievable.","Transition to the control-flow graph for calcDeliveryFee as a concrete example."]},
+
+{presenter:2, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">20 · White Box</div>
+    <h2 class="reveal r2">Control-flow graph — calcDeliveryFee()</h2>
+    <div class="split">
+      <svg viewBox="0 0 320 300" style="width:100%;height:auto;" id="cfgsvg">
+        <g font-size="12">
+          <rect x="110" y="10" width="100" height="36" rx="8" fill="rgba(255,255,255,.12)" stroke="#fff"/><text x="160" y="32" text-anchor="middle">Start</text>
+          <rect x="90" y="80" width="140" height="40" rx="8" fill="rgba(167,139,250,.18)" stroke="#a78bfa"/><text x="160" y="104" text-anchor="middle">subtotal ≥ 2000?</text>
+          <rect x="10" y="160" width="110" height="40" rx="8" fill="rgba(52,211,153,.18)" stroke="#34d399"/><text x="65" y="184" text-anchor="middle">fee = 0</text>
+          <rect x="190" y="160" width="120" height="40" rx="8" fill="rgba(244,114,182,.18)" stroke="#f472b6"/><text x="250" y="184" text-anchor="middle">area == Dhaka?</text>
+          <rect x="130" y="230" width="90" height="40" rx="8" fill="rgba(251,191,36,.18)" stroke="#fbbf24"/><text x="175" y="254" text-anchor="middle">fee = 80</text>
+          <rect x="230" y="230" width="90" height="40" rx="8" fill="rgba(248,113,113,.18)" stroke="#f87171"/><text x="275" y="254" text-anchor="middle">fee = 130</text>
+        </g>
+        <path class="cfgpath" d="M160,46 L160,80" stroke="#a78bfa"/>
+        <path class="cfgpath" id="p1" d="M120,110 Q90,140 70,160" stroke="#34d399"/>
+        <path class="cfgpath" id="p2" d="M200,110 Q225,135 250,160" stroke="#f472b6"/>
+        <path class="cfgpath" id="p3" d="M240,200 Q210,215 175,230" stroke="#fbbf24"/>
+        <path class="cfgpath" id="p4" d="M260,200 Q268,215 275,230" stroke="#f87171"/>
+      </svg>
+      <div class="reveal r3">
+        <p><b>4 independent paths (basis set):</b></p>
+        <ul>
+          <li><span style="color:#34d399">●</span> subtotal ≥ 2000 → fee = 0</li>
+          <li><span style="color:#f472b6">●</span> subtotal &lt; 2000, area = Dhaka → fee = 80</li>
+          <li><span style="color:#fbbf24">●</span> subtotal &lt; 2000, area ≠ Dhaka → fee = 130</li>
+          <li><span style="color:#f87171">●</span> boundary re-check at exactly 2000 → fee = 0</li>
+        </ul>
+        <p style="margin-top:10px;">Cyclomatic complexity = 4 → exactly 4 independent paths required for full basis path coverage. All 4 executed by the 81 unit tests.</p>
+      </div>
+    </div>
+  </div>
+  <style>
+    #cfgsvg .cfgpath{stroke-dasharray:200; stroke-dashoffset:200;}
+    .slide.active #cfgsvg .cfgpath{animation:draw 1.6s ease forwards;}
+    .slide.active #cfgsvg #p1{animation-delay:.3s;} .slide.active #cfgsvg #p2{animation-delay:.6s;}
+    .slide.active #cfgsvg #p3{animation-delay:.9s;} .slide.active #cfgsvg #p4{animation-delay:1.2s;}
+    @keyframes draw{to{stroke-dashoffset:0;}}
+  </style>`,
+  notes:["Walk through the CFG as it draws itself — start node, decision on subtotal, decision on area.","Cyclomatic complexity of calcDeliveryFee is 4, meaning exactly 4 independent paths form the basis set.","List each path out loud as its color highlights: free delivery, Dhaka fee, outside-Dhaka fee, and the exact-boundary case.","Basis path testing means every one of these 4 paths has at least one dedicated test case — confirmed in the 81 unit tests.","This is the concrete example of white box thinking — knowing the code's shape to design tests, not just guessing inputs."]},
+
+{presenter:2, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">21 · Coverage Results</div>
+    <h2 class="reveal r2">98%+ across the board</h2>
+    <div class="grid g4 reveal r3">
+      <div class="glass card" style="text-align:center;"><div class="counter" data-target="98.63">0</div><p>Statements</p><div class="barwrap"><div class="barfill" data-target="98.63"></div></div></div>
+      <div class="glass card" style="text-align:center;"><div class="counter" data-target="98.24">0</div><p>Branches</p><div class="barwrap"><div class="barfill" data-target="98.24"></div></div></div>
+      <div class="glass card" style="text-align:center;"><div class="counter" data-target="96.42">0</div><p>Functions</p><div class="barwrap"><div class="barfill" data-target="96.42"></div></div></div>
+      <div class="glass card" style="text-align:center;"><div class="counter" data-target="98.38">0</div><p>Lines</p><div class="barwrap"><div class="barfill" data-target="98.38"></div></div></div>
+    </div>
+    <div class="grid g2 reveal r4" style="margin-top:16px;">
+      <div class="glass card"><h3>lib/pricing.ts</h3><p>100% statements · 100% branches · 100% functions · 100% lines</p></div>
+      <div class="glass card"><h3>lib/validation.ts</h3><p>100% statements · 100% branches · 100% functions · 100% lines</p></div>
+    </div>
+    <div class="glass card reveal r5" style="margin-top:14px;">
+      <p>Cyclomatic complexity: validateCheckout() = 12 · calcDiscount() = 5 · calcDeliveryFee() = 4 · normalizeBDPhone() = 4 · generateOrderNo() = 3 · all others = 1. 81 test cases, 3 files, all passing via Vitest.</p>
+    </div>
+  </div>`,
+  notes:["Let the counters animate up — pause and let the numbers land before speaking over them.","Overall project coverage: 98.63% statements, 98.24% branches, 96.42% functions, 98.38% lines.","The two core modules — pricing.ts and validation.ts — hit 100% on all four metrics, because they're pure functions.","Cyclomatic complexity numbers show validateCheckout is the most complex function at 12 — matches the decision table from slide 16.","Close with the hard numbers: 81 test cases, 3 files, all passing, via Vitest."]},
+
+{presenter:2, html:`
+  <div class="glass panel">
+    <div class="kicker reveal r1">22 · Findings & Conclusion</div>
+    <h2 class="reveal r2">What we found, what we learned</h2>
+    <div class="grid g2">
+      <div class="glass card reveal r3">
+        <h3>Key safeguards verified correct</h3>
+        <ul>
+          <li>Prices always recomputed server-side — client can never forge a price</li>
+          <li>Stock decrement + order insert = one atomic Convex mutation</li>
+          <li>Meta CAPI call is scheduled, not awaited — a Meta outage can't fail an order</li>
+          <li>Cancelling/returning an order auto-restocks inventory</li>
+        </ul>
+      </div>
+      <div class="glass card reveal r4">
+        <h3>Lessons learned</h3>
+        <ul>
+          <li>Extracting pure logic early made 98%+ coverage realistic, not aspirational</li>
+          <li>Boundary tests caught the exact class of bug equivalence partitioning misses</li>
+          <li>Cyclomatic complexity numbers directly predicted where tests were most needed</li>
+        </ul>
+      </div>
+    </div>
+    <div class="glass card reveal r5" style="margin-top:14px; text-align:center;">
+      <p>Repo: github.com/vampxlr/outfleek &nbsp;·&nbsp; Live: outfleek.vercel.app</p>
+      <h2 style="margin-top:10px; margin-bottom:0;">Thank you — questions?</h2>
+    </div>
+  </div>`,
+  notes:["Summarize the four safeguards found correct during testing — these are strong, concrete claims backed by real test runs.","Lessons learned: connect back to slide 19's before/after refactor as the single highest-leverage QA decision made.","State the repo and live URLs clearly and slowly — audience may want to type them.","Open the floor for questions from the panel/audience.","Thank the instructor and audience; hand control back to Suvo if there's a joint Q&A."]},
+];
+
+/* ---------- render slides ---------- */
+const deckEl = document.getElementById('deck');
+SLIDES.forEach((s,i)=>{
+  const el = document.createElement('div');
+  el.className='slide'; el.id='slide-'+i;
+  el.innerHTML = `<div class="slide-inner">${s.html}</div>`;
+  deckEl.appendChild(el);
+});
+const dotsEl = document.getElementById('dots');
+SLIDES.forEach((s,i)=>{
+  const d = document.createElement('div');
+  d.className='dot'+(s.presenter===2?' p2':'');
+  d.onclick=()=>goto(i);
+  dotsEl.appendChild(d);
+});
+
+let current = 0;
+function render(){
+  SLIDES.forEach((s,i)=>{
+    const el = document.getElementById('slide-'+i);
+    el.classList.remove('active','prev');
+    if(i===current) el.classList.add('active');
+    else if(i<current) el.classList.add('prev');
+  });
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active', i===current));
+  document.getElementById('topfill').style.width = ((current+1)/SLIDES.length*100)+'%';
+  const s = SLIDES[current];
+  const p = s.presenter===1?PRESENTER_1:PRESENTER_2;
+  document.getElementById('presenterLabel').textContent = p.name;
+  document.getElementById('slideCount').textContent = 'Slide '+(current+1)+' / '+SLIDES.length;
+  renderNotes();
+  runCounters();
+}
+function goto(i){ current = Math.max(0, Math.min(SLIDES.length-1, i)); render(); }
+function go(delta){ goto(current+delta); }
+
+/* notes */
+function renderNotes(){
+  const s = SLIDES[current];
+  document.getElementById('notesTitle').textContent = 'Slide '+(current+1)+' talking points';
+  const list = document.getElementById('notesList');
+  list.innerHTML = (s.notes||[]).map(n=>`<li>${n}</li>`).join('');
+}
+function toggleNotes(){ document.getElementById('notes').classList.toggle('show'); }
+
+/* animated counters/bars — re-run each time slide becomes active */
+function runCounters(){
+  const active = document.getElementById('slide-'+current);
+  if(!active) return;
+  active.querySelectorAll('.counter').forEach(c=>{
+    const target = parseFloat(c.dataset.target);
+    let start=null;
+    c.textContent='0';
+    function step(ts){
+      if(!start) start=ts;
+      const p = Math.min(1,(ts-start)/1200);
+      c.textContent=(target*p).toFixed(2);
+      if(p<1) requestAnimationFrame(step); else c.textContent=target.toFixed(2);
+    }
+    requestAnimationFrame(step);
+  });
+  active.querySelectorAll('.barfill').forEach(b=>{
+    b.style.width='0%';
+    requestAnimationFrame(()=> requestAnimationFrame(()=>{ b.style.width=b.dataset.target+'%'; }));
+  });
+}
+
+/* keyboard nav */
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='ArrowRight'||e.key===' '){ e.preventDefault(); go(1); }
+  else if(e.key==='ArrowLeft'){ e.preventDefault(); go(-1); }
+  else if(e.key.toLowerCase()==='n'){ toggleNotes(); }
+  else if(e.key.toLowerCase()==='t'){ toggleTimer(); }
+  else if(e.key.toLowerCase()==='r'){ resetTimer(); }
+  else if(e.key.toLowerCase()==='f'){ toggleFullscreen(); }
+  else if(/^[1-9]$/.test(e.key)){ const n=parseInt(e.key)-1; if(n<SLIDES.length) goto(n); }
+});
+function toggleFullscreen(){
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+}
+
+/* swipe */
+let touchX=null;
+document.addEventListener('touchstart', e=>{ touchX = e.touches[0].clientX; });
+document.addEventListener('touchend', e=>{
+  if(touchX===null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if(Math.abs(dx)>50) go(dx<0?1:-1);
+  touchX=null;
+});
+
+/* timer — resets automatically per-presenter segment when crossing into the other presenter */
+let timerSeconds=0, timerRunning=false, timerInterval=null, lastPresenter=1;
+function toggleTimer(){
+  timerRunning = !timerRunning;
+  if(timerRunning){
+    timerInterval = setInterval(()=>{ timerSeconds++; updateTimerDisplay(); }, 1000);
+  } else clearInterval(timerInterval);
+}
+function resetTimer(){ timerSeconds=0; updateTimerDisplay(); }
+function updateTimerDisplay(){
+  const m = String(Math.floor(timerSeconds/60)).padStart(2,'0');
+  const s = String(timerSeconds%60).padStart(2,'0');
+  const el = document.getElementById('timer');
+  el.textContent = m+':'+s;
+  el.classList.remove('amber','red');
+  if(timerSeconds>=600) el.classList.add('red');
+  else if(timerSeconds>=480) el.classList.add('amber');
+}
+/* auto-reset timer when switching presenters */
+const origGoto = goto;
+goto = function(i){
+  origGoto(i);
+  const s = SLIDES[current];
+  if(s.presenter !== lastPresenter){ lastPresenter = s.presenter; timerSeconds=0; updateTimerDisplay(); }
+};
+
+/* reduced motion */
+if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  document.querySelectorAll('.blob').forEach(b=>b.style.animation='none');
+}
+
+/* fade help toast */
+setTimeout(()=>{ const t=document.getElementById('helpToast'); if(t) t.style.transition='opacity 1s'; if(t) t.style.opacity='0'; }, 6000);
+
+render();
+</script>

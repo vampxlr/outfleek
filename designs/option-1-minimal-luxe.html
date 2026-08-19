@@ -1,0 +1,411 @@
+<title>ATELIER DHAKA — Minimal Luxe Menswear</title>
+<style>
+  :root{
+    --bg:#faf9f6; --bg2:#f3f1ec; --ink:#191817; --ink2:#5c5a55;
+    --hair:#e4e1da; --gold:#b08d3e; --white:#ffffff;
+    --serif:Georgia,'Times New Roman',serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
+  a{color:inherit;text-decoration:none}
+
+  /* Announcement */
+  .announce{background:var(--ink);color:#d8d4cc;text-align:center;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:9px 16px}
+  .announce b{color:var(--gold);font-weight:600}
+
+  /* Header */
+  header{position:sticky;top:0;z-index:60;background:rgba(250,249,246,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--hair);transition:box-shadow .35s ease}
+  header.scrolled{box-shadow:0 6px 24px rgba(25,24,23,.08)}
+  .hwrap{max-width:1280px;margin:0 auto;padding:0 28px;height:66px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .logo{font-family:var(--serif);font-size:21px;letter-spacing:.26em;font-weight:400}
+  .logo em{font-style:normal;color:var(--gold)}
+  nav.mainnav{display:flex;gap:34px}
+  nav.mainnav a{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);position:relative;padding:6px 0;transition:color .25s}
+  nav.mainnav a:hover,nav.mainnav a.active{color:var(--ink)}
+  nav.mainnav a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--gold);transition:width .3s ease}
+  nav.mainnav a:hover::after,nav.mainnav a.active::after{width:100%}
+  .hicons{display:flex;align-items:center;gap:18px}
+  .icon-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;position:relative;color:var(--ink);transition:opacity .2s}
+  .icon-btn:hover{opacity:.6}
+  .icon-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .cart-count{position:absolute;top:1px;right:0;min-width:16px;height:16px;border-radius:8px;background:var(--gold);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;padding:0 4px;transition:transform .2s}
+  .icon-btn.bump{animation:bump .5s ease}
+  @keyframes bump{0%{transform:scale(1)}30%{transform:scale(1.28) rotate(-6deg)}60%{transform:scale(.94)}100%{transform:scale(1)}}
+  .burger{display:none;flex-direction:column;gap:5px;width:36px;height:36px;align-items:center;justify-content:center}
+  .burger span{display:block;width:20px;height:1.5px;background:var(--ink);transition:.3s}
+  .burger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+  .burger.open span:nth-child(2){opacity:0}
+  .burger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+  .mobilenav{display:none;border-top:1px solid var(--hair);background:var(--bg)}
+  .mobilenav.open{display:block}
+  .mobilenav a{display:block;padding:15px 28px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;border-bottom:1px solid var(--hair);color:var(--ink2)}
+
+  /* Hero */
+  .hero{max-width:1280px;margin:0 auto;padding:72px 28px 56px;text-align:center;border-bottom:1px solid var(--hair)}
+  .hero .kicker{font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+  .hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(38px,6.4vw,74px);line-height:1.08;letter-spacing:.01em}
+  .hero h1 em{font-style:italic;color:var(--gold)}
+  .hero p{margin:22px auto 0;max-width:520px;color:var(--ink2);font-size:15px;letter-spacing:.02em}
+  .hero .rule{width:56px;height:1px;background:var(--gold);margin:30px auto 0}
+
+  /* Toolbar */
+  .toolbar{max-width:1280px;margin:0 auto;padding:26px 28px 8px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  .pills{display:flex;gap:10px;flex-wrap:wrap}
+  .pill{border:1px solid var(--hair);padding:9px 20px;border-radius:999px;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);background:transparent;transition:all .3s ease}
+  .pill:hover{border-color:var(--ink);color:var(--ink)}
+  .pill.active{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+  .sortwrap{display:flex;align-items:center;gap:10px;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+  .sortwrap select{font-family:var(--sans);font-size:12px;letter-spacing:.08em;padding:9px 12px;border:1px solid var(--hair);background:transparent;color:var(--ink);border-radius:0;outline:none;cursor:pointer}
+
+  /* Grid */
+  .gridwrap{max-width:1280px;margin:0 auto;padding:26px 28px 90px}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--hair);border:1px solid var(--hair);transition:opacity .3s ease}
+  .grid.fading{opacity:0}
+  .card{background:var(--bg);padding:0 0 22px;position:relative;transition:transform .35s ease,box-shadow .35s ease,opacity .5s ease .05s;opacity:1}
+  .card.hidden{display:none}
+  .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(25,24,23,.10);z-index:2;background:var(--white)}
+  .thumb{position:relative;aspect-ratio:4/5;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .thumb .art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+  .card:hover .thumb .art{transform:scale(1.07)}
+  .thumb svg.tee{width:52%;height:auto;opacity:.9;filter:drop-shadow(0 10px 18px rgba(0,0,0,.10))}
+  .badge{position:absolute;top:14px;left:14px;background:var(--ink);color:var(--bg);font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:5px 10px;z-index:3}
+  .badge.gold{background:var(--gold);color:#fff}
+  .addbtn{position:absolute;left:14px;right:14px;bottom:14px;background:var(--ink);color:var(--bg);font-size:11px;letter-spacing:.2em;text-transform:uppercase;padding:13px 10px;opacity:0;transform:translateY(10px);transition:all .35s ease;z-index:3}
+  .addbtn:hover{background:var(--gold)}
+  .card:hover .addbtn{opacity:1;transform:translateY(0)}
+  .cinfo{padding:18px 18px 0;text-align:center}
+  .ccat{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+  .cname{font-family:var(--serif);font-size:17px;font-weight:400;letter-spacing:.02em}
+  .cprice{margin-top:8px;font-size:14px;letter-spacing:.04em}
+  .cprice .old{color:#a9a49b;text-decoration:line-through;margin-right:8px;font-size:12.5px}
+
+  /* Reveal */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* Footer */
+  footer{border-top:1px solid var(--hair);background:var(--bg2)}
+  .fwrap{max-width:1280px;margin:0 auto;padding:64px 28px 30px;display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:40px}
+  .fcol h4{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink);margin-bottom:18px;font-weight:600}
+  .fcol a{display:block;font-size:13px;color:var(--ink2);margin-bottom:10px;transition:color .2s}
+  .fcol a:hover{color:var(--gold)}
+  .fcol p{font-size:13px;color:var(--ink2);max-width:280px}
+  .flogo{font-family:var(--serif);font-size:19px;letter-spacing:.26em;margin-bottom:14px}
+  .paybadges{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .pb{border:1px solid var(--hair);background:var(--white);padding:7px 14px;font-size:11px;letter-spacing:.08em;font-weight:600}
+  .pb.bkash{color:#d12053}.pb.nagad{color:#ec1d24}.pb.cod{color:var(--ink2)}
+  .fbottom{border-top:1px solid var(--hair);text-align:center;padding:18px;font-size:11px;letter-spacing:.12em;color:#a9a49b;text-transform:uppercase}
+
+  /* Cart drawer */
+  .overlay{position:fixed;inset:0;background:rgba(25,24,23,.4);opacity:0;pointer-events:none;transition:opacity .35s ease;z-index:80}
+  .overlay.show{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(400px,92vw);background:var(--bg);z-index:90;transform:translateX(105%);transition:transform .45s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(25,24,23,.15)}
+  .drawer.open{transform:none}
+  .dhead{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid var(--hair)}
+  .dhead h3{font-family:var(--serif);font-weight:400;font-size:19px;letter-spacing:.08em}
+  .dclose{font-size:22px;line-height:1;color:var(--ink2)}
+  .ditems{flex:1;overflow-y:auto;padding:8px 24px}
+  .dempty{text-align:center;color:var(--ink2);padding:60px 20px;font-size:13px;letter-spacing:.06em}
+  .dempty .em{font-size:34px;display:block;margin-bottom:14px;opacity:.5}
+  .ditem{display:flex;gap:14px;padding:18px 0;border-bottom:1px solid var(--hair);animation:slidein .35s ease}
+  @keyframes slidein{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+  .dthumb{width:58px;height:72px;flex:none;display:flex;align-items:center;justify-content:center}
+  .dthumb svg{width:70%;height:auto}
+  .dinfo{flex:1}
+  .dinfo .n{font-family:var(--serif);font-size:15px}
+  .dinfo .m{font-size:12px;color:var(--ink2);margin-top:3px}
+  .dinfo .p{font-size:13px;margin-top:5px;letter-spacing:.04em}
+  .drem{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#a9a49b;align-self:flex-start;padding-top:2px;border-bottom:1px solid transparent;transition:.2s}
+  .drem:hover{color:#c0392b}
+  .dfoot{border-top:1px solid var(--hair);padding:20px 24px 26px;background:var(--bg2)}
+  .drow{display:flex;justify-content:space-between;font-size:13px;letter-spacing:.06em;margin-bottom:6px;color:var(--ink2)}
+  .drow.total{font-size:16px;color:var(--ink);font-family:var(--serif);margin:10px 0 16px}
+  .checkout{display:block;width:100%;background:var(--ink);color:var(--bg);text-align:center;padding:15px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;transition:background .25s}
+  .checkout:hover{background:var(--gold)}
+  .checkout.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink);margin-bottom:10px;transition:all .25s}
+  .checkout.ghost:hover{background:transparent;color:var(--gold);border-color:var(--gold)}
+  .dnote{text-align:center;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#a9a49b;margin-top:12px}
+
+  /* Toast */
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:var(--bg);font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:12px 26px;z-index:100;transition:transform .4s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  @media(max-width:980px){
+    .grid{grid-template-columns:repeat(3,1fr)}
+    .fwrap{grid-template-columns:1fr 1fr;gap:34px}
+  }
+  @media(max-width:680px){
+    nav.mainnav{display:none}
+    .burger{display:flex}
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .hwrap{padding:0 18px}
+    .hero{padding:52px 18px 42px}
+    .toolbar,.gridwrap{padding-left:18px;padding-right:18px}
+    .cinfo{padding:14px 10px 0}
+    .cname{font-size:15px}
+    .addbtn{opacity:1;transform:none;padding:11px 8px;font-size:10px}
+    .fwrap{grid-template-columns:1fr;padding:48px 18px 24px}
+  }
+</style>
+
+<div class="announce">Free delivery over <b>৳2000</b> &nbsp;·&nbsp; Cash on Delivery available nationwide</div>
+
+<header id="header">
+  <div class="hwrap">
+    <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+    <a class="logo" href="#">ATELIER<em>·</em>DHAKA</a>
+    <nav class="mainnav">
+      <a href="#" class="active">Home</a>
+      <a href="#shop">Shop</a>
+      <a href="#footer">About</a>
+    </nav>
+    <div class="hicons">
+      <button class="icon-btn" aria-label="Search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      </button>
+      <button class="icon-btn" id="cartBtn" aria-label="Cart">
+        <svg viewBox="0 0 24 24"><path d="M6 7h12l1.2 12.2a1 1 0 0 1-1 1.1H5.8a1 1 0 0 1-1-1.1L6 7z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+  <div class="mobilenav" id="mobilenav">
+    <a href="#">Home</a><a href="#shop">Shop</a><a href="#footer">About</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="kicker reveal">New Collection · Monsoon '26</div>
+  <h1 class="reveal">Quiet luxury,<br><em>made for Dhaka.</em></h1>
+  <p class="reveal">Elevated essentials in breathable premium cotton — cut, stitched and finished in Bangladesh.</p>
+  <div class="rule reveal"></div>
+</section>
+
+<div class="toolbar" id="shop">
+  <div class="pills reveal" id="pills">
+    <button class="pill active" data-cat="all">All</button>
+    <button class="pill" data-cat="tshirt">T-Shirts</button>
+    <button class="pill" data-cat="polo">Polos</button>
+    <button class="pill" data-cat="hoodie">Hoodies</button>
+    <button class="pill" data-cat="drop">Drop Shoulder</button>
+  </div>
+  <div class="sortwrap reveal">
+    <label for="sort">Sort</label>
+    <select id="sort">
+      <option value="feat">Featured</option>
+      <option value="low">Price: Low to High</option>
+      <option value="high">Price: High to Low</option>
+    </select>
+  </div>
+</div>
+
+<main class="gridwrap">
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer id="footer">
+  <div class="fwrap">
+    <div class="fcol">
+      <div class="flogo">ATELIER·DHAKA</div>
+      <p>A premium menswear studio from Dhaka. Small batches, honest fabric, timeless cuts — delivered anywhere in Bangladesh.</p>
+    </div>
+    <div class="fcol">
+      <h4>Shop</h4>
+      <a href="#shop">T-Shirts</a><a href="#shop">Polos</a><a href="#shop">Hoodies</a><a href="#shop">Drop Shoulder</a>
+    </div>
+    <div class="fcol">
+      <h4>Help</h4>
+      <a href="#">Size Guide</a><a href="#">Delivery &amp; Returns</a><a href="#">Track Order</a><a href="#">Contact</a>
+    </div>
+    <div class="fcol">
+      <h4>We Accept</h4>
+      <div class="paybadges">
+        <span class="pb bkash">bKash</span>
+        <span class="pb nagad">Nagad</span>
+        <span class="pb cod">Cash on Delivery</span>
+      </div>
+    </div>
+  </div>
+  <div class="fbottom">© 2026 Atelier Dhaka · Crafted in Bangladesh</div>
+</footer>
+
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer" aria-label="Shopping cart">
+  <div class="dhead"><h3>Your Cart</h3><button class="dclose" id="drawerClose" aria-label="Close">×</button></div>
+  <div class="ditems" id="ditems"></div>
+  <div class="dfoot">
+    <div class="drow"><span>Delivery</span><span id="delivery">—</span></div>
+    <div class="drow total"><span>Total</span><span id="total">৳0</span></div>
+    <a class="checkout ghost" href="cart.html">View Cart</a>
+    <a class="checkout" href="checkout.html">Checkout</a>
+    <div class="dnote">bKash · Nagad · Cash on Delivery</div>
+  </div>
+</aside>
+
+<div class="toast" id="toast">Added to cart</div>
+
+<script>
+(function(){
+  var PRODUCTS=[
+    {id:1,name:"Essential Crew Tee",cat:"tshirt",catLabel:"T-Shirt",price:590,old:null,badge:null,c1:"#e9e5dc",c2:"#d6d0c2",tee:"#191817"},
+    {id:2,name:"Charcoal Heavy Tee",cat:"tshirt",catLabel:"T-Shirt",price:690,old:850,badge:"Sale",c1:"#e2e0dd",c2:"#c9c6c0",tee:"#3a3835"},
+    {id:3,name:"Ivory Pima Polo",cat:"polo",catLabel:"Polo",price:990,old:null,badge:"New",c1:"#f0ece2",c2:"#ddd5c2",tee:"#f5f1e6"},
+    {id:4,name:"Midnight Knit Polo",cat:"polo",catLabel:"Polo",price:1090,old:1290,badge:"Sale",c1:"#e4e6e8",c2:"#cbd0d4",tee:"#22262e"},
+    {id:5,name:"Cloud Fleece Hoodie",cat:"hoodie",catLabel:"Hoodie",price:1590,old:null,badge:null,c1:"#ece8e0",c2:"#d8d2c4",tee:"#8f8a80"},
+    {id:6,name:"Onyx Zip Hoodie",cat:"hoodie",catLabel:"Hoodie",price:1790,old:2100,badge:"Sale",c1:"#e3e1de",c2:"#c8c5c0",tee:"#1d1c1a"},
+    {id:7,name:"Oat Drop Shoulder",cat:"drop",catLabel:"Drop Shoulder",price:790,old:null,badge:"New",c1:"#efe9dd",c2:"#dccfb6",tee:"#cbb894"},
+    {id:8,name:"Slate Drop Shoulder",cat:"drop",catLabel:"Drop Shoulder",price:790,old:950,badge:"Sale",c1:"#e5e7e6",c2:"#ccd1cf",tee:"#5b6663"},
+    {id:9,name:"Bone Pocket Tee",cat:"tshirt",catLabel:"T-Shirt",price:640,old:null,badge:null,c1:"#f1ede4",c2:"#ded6c6",tee:"#efe9db"},
+    {id:10,name:"Forest Pique Polo",cat:"polo",catLabel:"Polo",price:1050,old:null,badge:null,c1:"#e7eae4",c2:"#cfd6ca",tee:"#2e4237"},
+    {id:11,name:"Ash Oversize Hoodie",cat:"hoodie",catLabel:"Hoodie",price:1690,old:null,badge:"New",c1:"#e9e8e6",c2:"#d3d1cd",tee:"#a7a49e"},
+    {id:12,name:"Espresso Drop Tee",cat:"drop",catLabel:"Drop Shoulder",price:840,old:990,badge:"Sale",c1:"#ece5dc",c2:"#d9cbba",tee:"#4a382c"}
+  ];
+
+  function teeSvg(color,cls){
+    return '<svg class="'+(cls||'tee')+'" viewBox="0 0 100 100"><path fill="'+color+'" stroke="rgba(0,0,0,.12)" stroke-width="1" d="M35 12 L20 20 L8 38 L20 46 L24 38 L24 88 L76 88 L76 38 L80 46 L92 38 L80 20 L65 12 C62 19 56 22 50 22 C44 22 38 19 35 12 Z"/></svg>';
+  }
+  function tk(n){return '৳'+n.toLocaleString('en-IN');}
+
+  /* Render grid */
+  var grid=document.getElementById('grid');
+  function render(list){
+    grid.innerHTML=list.map(function(p){
+      return '<article class="card reveal" data-cat="'+p.cat+'">'+
+        '<a href="product.html?id='+p.id+'" class="thumb"><div class="art" style="background:linear-gradient(145deg,'+p.c1+' 0%,'+p.c2+' 100%)">'+teeSvg(p.tee)+'</div>'+
+        (p.badge?'<span class="badge'+(p.badge==='New'?' gold':'')+'">'+p.badge+'</span>':'')+
+        '<button class="addbtn" data-id="'+p.id+'">Add to Cart</button></a>'+
+        '<div class="cinfo"><div class="ccat">'+p.catLabel+'</div>'+
+        '<div class="cname"><a href="product.html?id='+p.id+'">'+p.name+'</a></div>'+
+        '<div class="cprice">'+(p.old?'<span class="old">'+tk(p.old)+'</span>':'')+tk(p.price)+'</div></div></article>';
+    }).join('');
+    observeReveals();
+  }
+
+  /* Scroll reveal with stagger */
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e,i){
+      if(e.isIntersecting){
+        e.target.style.transitionDelay=(Math.min(i,6)*70)+'ms';
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:.08});
+  function observeReveals(){
+    document.querySelectorAll('.reveal:not(.in)').forEach(function(el){io.observe(el);});
+  }
+
+  /* Filter + sort */
+  var currentCat='all';
+  function currentList(){
+    var list=PRODUCTS.filter(function(p){return currentCat==='all'||p.cat===currentCat;});
+    var s=document.getElementById('sort').value;
+    if(s==='low')list=list.slice().sort(function(a,b){return a.price-b.price;});
+    if(s==='high')list=list.slice().sort(function(a,b){return b.price-a.price;});
+    return list;
+  }
+  function refresh(){
+    grid.classList.add('fading');
+    setTimeout(function(){render(currentList());grid.classList.remove('fading');},300);
+  }
+  document.getElementById('pills').addEventListener('click',function(e){
+    var b=e.target.closest('.pill'); if(!b)return;
+    document.querySelectorAll('.pill').forEach(function(p){p.classList.remove('active');});
+    b.classList.add('active'); currentCat=b.dataset.cat; refresh();
+  });
+  document.getElementById('sort').addEventListener('change',refresh);
+
+  /* Cart */
+  var cart={}; // id -> qty
+  var CART_KEY='luxe_cart';
+  function loadCart(){
+    try{
+      var arr=JSON.parse(localStorage.getItem(CART_KEY)||'[]');
+      if(Array.isArray(arr))arr.forEach(function(it){
+        if(it&&it.id&&it.qty>0&&PRODUCTS.some(function(p){return p.id==it.id;}))cart[it.id]=(cart[it.id]||0)+it.qty;
+      });
+    }catch(e){}
+  }
+  function saveCart(){
+    var arr=Object.keys(cart).map(function(id){
+      var p=PRODUCTS.find(function(x){return x.id==id;});
+      return {id:p.id,name:p.name,price:p.price,qty:cart[id],size:'M'};
+    });
+    try{localStorage.setItem(CART_KEY,JSON.stringify(arr));}catch(e){}
+  }
+  var drawer=document.getElementById('drawer'),overlay=document.getElementById('overlay');
+  function openDrawer(){drawer.classList.add('open');overlay.classList.add('show');}
+  function closeDrawer(){drawer.classList.remove('open');overlay.classList.remove('show');}
+  document.getElementById('cartBtn').addEventListener('click',openDrawer);
+  document.getElementById('drawerClose').addEventListener('click',closeDrawer);
+  overlay.addEventListener('click',closeDrawer);
+
+  function cartTotals(){
+    var count=0,total=0;
+    Object.keys(cart).forEach(function(id){
+      var p=PRODUCTS.find(function(x){return x.id==id;});
+      count+=cart[id]; total+=p.price*cart[id];
+    });
+    return {count:count,total:total};
+  }
+  function renderCart(){
+    var box=document.getElementById('ditems');
+    var ids=Object.keys(cart);
+    if(!ids.length){
+      box.innerHTML='<div class="dempty"><span class="em">🧺</span>Your cart is empty.<br>Beautiful basics await.</div>';
+    }else{
+      box.innerHTML=ids.map(function(id){
+        var p=PRODUCTS.find(function(x){return x.id==id;});
+        return '<div class="ditem"><div class="dthumb" style="background:linear-gradient(145deg,'+p.c1+','+p.c2+')">'+teeSvg(p.tee,'')+'</div>'+
+          '<div class="dinfo"><div class="n">'+p.name+'</div><div class="m">Qty '+cart[id]+' · '+p.catLabel+'</div>'+
+          '<div class="p">'+tk(p.price*cart[id])+'</div></div>'+
+          '<button class="drem" data-id="'+id+'">Remove</button></div>';
+      }).join('');
+    }
+    var t=cartTotals();
+    var cc=document.getElementById('cartCount');
+    cc.textContent=t.count;
+    document.getElementById('total').textContent=tk(t.total);
+    document.getElementById('delivery').textContent=t.total===0?'—':(t.total>=2000?'Free':'৳80');
+  }
+  document.getElementById('ditems').addEventListener('click',function(e){
+    var b=e.target.closest('.drem'); if(!b)return;
+    delete cart[b.dataset.id]; saveCart(); renderCart();
+  });
+
+  var toastTimer;
+  grid.addEventListener('click',function(e){
+    var b=e.target.closest('.addbtn'); if(!b)return;
+    e.preventDefault(); e.stopPropagation();
+    var id=b.dataset.id;
+    cart[id]=(cart[id]||0)+1;
+    saveCart();
+    renderCart();
+    var cb=document.getElementById('cartBtn');
+    cb.classList.remove('bump'); void cb.offsetWidth; cb.classList.add('bump');
+    var toast=document.getElementById('toast');
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(function(){toast.classList.remove('show');},1600);
+  });
+
+  /* Header shadow + mobile nav */
+  var header=document.getElementById('header');
+  window.addEventListener('scroll',function(){
+    header.classList.toggle('scrolled',window.scrollY>8);
+  },{passive:true});
+  var burger=document.getElementById('burger'),mnav=document.getElementById('mobilenav');
+  burger.addEventListener('click',function(){
+    burger.classList.toggle('open'); mnav.classList.toggle('open');
+  });
+  mnav.addEventListener('click',function(){burger.classList.remove('open');mnav.classList.remove('open');});
+
+  loadCart();
+  render(PRODUCTS);
+  renderCart();
+  observeReveals();
+})();
+</script>

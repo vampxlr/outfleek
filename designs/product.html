@@ -1,0 +1,610 @@
+<title>Product — ATELIER DHAKA</title>
+<style>
+  :root{
+    --bg:#faf9f6; --bg2:#f3f1ec; --ink:#191817; --ink2:#5c5a55;
+    --hair:#e4e1da; --gold:#b08d3e; --white:#ffffff;
+    --serif:Georgia,'Times New Roman',serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
+  a{color:inherit;text-decoration:none}
+
+  /* Announcement */
+  .announce{background:var(--ink);color:#d8d4cc;text-align:center;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:9px 16px}
+  .announce b{color:var(--gold);font-weight:600}
+
+  /* Header */
+  header{position:sticky;top:0;z-index:60;background:rgba(250,249,246,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--hair);transition:box-shadow .35s ease}
+  header.scrolled{box-shadow:0 6px 24px rgba(25,24,23,.08)}
+  .hwrap{max-width:1280px;margin:0 auto;padding:0 28px;height:66px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .logo{font-family:var(--serif);font-size:21px;letter-spacing:.26em;font-weight:400}
+  .logo em{font-style:normal;color:var(--gold)}
+  nav.mainnav{display:flex;gap:34px}
+  nav.mainnav a{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);position:relative;padding:6px 0;transition:color .25s}
+  nav.mainnav a:hover,nav.mainnav a.active{color:var(--ink)}
+  nav.mainnav a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--gold);transition:width .3s ease}
+  nav.mainnav a:hover::after,nav.mainnav a.active::after{width:100%}
+  .hicons{display:flex;align-items:center;gap:18px}
+  .icon-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;position:relative;color:var(--ink);transition:opacity .2s}
+  .icon-btn:hover{opacity:.6}
+  .icon-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .cart-count{position:absolute;top:1px;right:0;min-width:16px;height:16px;border-radius:8px;background:var(--gold);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;padding:0 4px;transition:transform .2s}
+  .icon-btn.bump{animation:bump .5s ease}
+  @keyframes bump{0%{transform:scale(1)}30%{transform:scale(1.28) rotate(-6deg)}60%{transform:scale(.94)}100%{transform:scale(1)}}
+  .burger{display:none;flex-direction:column;gap:5px;width:36px;height:36px;align-items:center;justify-content:center}
+  .burger span{display:block;width:20px;height:1.5px;background:var(--ink);transition:.3s}
+  .burger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+  .burger.open span:nth-child(2){opacity:0}
+  .burger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+  .mobilenav{display:none;border-top:1px solid var(--hair);background:var(--bg)}
+  .mobilenav.open{display:block}
+  .mobilenav a{display:block;padding:15px 28px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;border-bottom:1px solid var(--hair);color:var(--ink2)}
+
+  /* Breadcrumb */
+  .crumbs{max-width:1280px;margin:0 auto;padding:22px 28px 0;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#a9a49b}
+  .crumbs a{color:var(--ink2);transition:color .2s}
+  .crumbs a:hover{color:var(--gold)}
+  .crumbs .sep{margin:0 8px;color:var(--hair)}
+  .crumbs .cur{color:var(--ink)}
+
+  /* Product layout */
+  .pwrap{max-width:1280px;margin:0 auto;padding:30px 28px 70px;display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:start}
+
+  /* Gallery */
+  .gallery{position:sticky;top:96px}
+  .mainimg{position:relative;aspect-ratio:4/5;border:1px solid var(--hair);display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--bg2)}
+  .mainimg .art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:opacity .35s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+  .mainimg .art.fading{opacity:0}
+  .mainimg svg.tee{width:56%;height:auto;filter:drop-shadow(0 14px 26px rgba(0,0,0,.12))}
+  .mainimg .badge{position:absolute;top:16px;left:16px;background:var(--ink);color:var(--bg);font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:5px 10px;z-index:3}
+  .mainimg .badge.gold{background:var(--gold);color:#fff}
+  .thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+  .tbtn{aspect-ratio:4/5;border:1px solid var(--hair);display:flex;align-items:center;justify-content:center;padding:0;overflow:hidden;position:relative;transition:border-color .25s}
+  .tbtn:hover{border-color:var(--ink2)}
+  .tbtn.active{border-color:var(--gold)}
+  .tbtn .art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .tbtn svg{width:56%;height:auto}
+
+  /* Info */
+  .pcat{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+  h1.pname{font-family:var(--serif);font-weight:400;font-size:clamp(28px,3.6vw,42px);line-height:1.12;letter-spacing:.01em}
+  .pricerow{display:flex;align-items:center;gap:14px;margin:18px 0 8px;flex-wrap:wrap}
+  .pprice{font-family:var(--serif);font-size:26px;letter-spacing:.02em}
+  .pold{color:#a9a49b;text-decoration:line-through;font-size:16px}
+  .salebadge{background:var(--gold);color:#fff;font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:5px 10px}
+  .stars{display:flex;align-items:center;gap:10px;margin-bottom:20px;font-size:12px;color:var(--ink2);letter-spacing:.06em}
+  .stars .s{color:var(--gold);font-size:14px;letter-spacing:2px}
+  .pdesc{color:var(--ink2);font-size:14.5px;max-width:480px;border-top:1px solid var(--hair);padding-top:20px}
+
+  .optlabel{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink);margin:26px 0 12px;font-weight:600}
+  .optlabel span{color:var(--ink2);font-weight:400;text-transform:none;letter-spacing:.04em;margin-left:8px}
+  .sizes{display:flex;gap:10px;flex-wrap:wrap}
+  .sizebtn{min-width:52px;padding:11px 14px;border:1px solid var(--hair);font-size:12px;letter-spacing:.12em;color:var(--ink2);transition:all .25s ease}
+  .sizebtn:hover{border-color:var(--ink);color:var(--ink)}
+  .sizebtn.active{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+  .swatches{display:flex;gap:12px}
+  .swatch{width:34px;height:34px;border-radius:50%;border:1px solid rgba(0,0,0,.15);position:relative;transition:transform .2s}
+  .swatch:hover{transform:scale(1.1)}
+  .swatch.active::after{content:"";position:absolute;inset:-6px;border:1px solid var(--gold);border-radius:50%}
+
+  .buyrow{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap;align-items:stretch}
+  .qty{display:flex;align-items:center;border:1px solid var(--hair)}
+  .qty button{width:42px;height:100%;min-height:50px;font-size:17px;color:var(--ink2);transition:color .2s}
+  .qty button:hover{color:var(--ink)}
+  .qty .qv{width:38px;text-align:center;font-size:14px;letter-spacing:.04em}
+  .addcart{flex:1;min-width:190px;background:var(--ink);color:var(--bg);font-size:12px;letter-spacing:.22em;text-transform:uppercase;padding:16px 20px;transition:background .25s}
+  .addcart:hover{background:var(--gold)}
+  .ordernow{display:block;width:100%;margin-top:12px;text-align:center;border:1px solid var(--ink);padding:15px 20px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;transition:all .25s}
+  .ordernow:hover{background:var(--ink);color:var(--bg)}
+  .trust{margin-top:24px;border-top:1px solid var(--hair);padding-top:18px;display:flex;gap:8px 22px;flex-wrap:wrap;font-size:12px;color:var(--ink2);letter-spacing:.04em}
+
+  /* Tabs */
+  .tabsec{max-width:1280px;margin:0 auto;padding:0 28px 80px}
+  .tabbar{display:flex;gap:34px;border-bottom:1px solid var(--hair);position:relative}
+  .tabbtn{padding:16px 2px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);transition:color .25s}
+  .tabbtn.active{color:var(--ink)}
+  .tabline{position:absolute;bottom:-1px;height:2px;background:var(--gold);transition:left .35s cubic-bezier(.2,.8,.2,1),width .35s cubic-bezier(.2,.8,.2,1)}
+  .tabpane{display:none;padding:30px 0 0;max-width:720px;color:var(--ink2);font-size:14.5px;animation:fadeup .45s ease}
+  .tabpane.show{display:block}
+  @keyframes fadeup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .tabpane h3{font-family:var(--serif);font-weight:400;color:var(--ink);font-size:20px;margin-bottom:12px}
+  .tabpane ul{margin:12px 0 0 18px}
+  .tabpane li{margin-bottom:6px}
+  table.sizetable{border-collapse:collapse;width:100%;margin-top:14px;font-size:13px}
+  .sizetable th,.sizetable td{border:1px solid var(--hair);padding:10px 14px;text-align:center}
+  .sizetable th{background:var(--bg2);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);font-weight:600}
+
+  /* Related */
+  .relsec{max-width:1280px;margin:0 auto;padding:0 28px 90px}
+  .relhead{text-align:center;margin-bottom:34px}
+  .relhead .kicker{font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+  .relhead h2{font-family:var(--serif);font-weight:400;font-size:clamp(24px,3.4vw,34px)}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--hair);border:1px solid var(--hair)}
+  .card{background:var(--bg);padding:0 0 22px;position:relative;transition:transform .35s ease,box-shadow .35s ease}
+  .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(25,24,23,.10);z-index:2;background:var(--white)}
+  .thumb{position:relative;aspect-ratio:4/5;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .thumb .art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+  .card:hover .thumb .art{transform:scale(1.07)}
+  .thumb svg.tee{width:52%;height:auto;opacity:.9;filter:drop-shadow(0 10px 18px rgba(0,0,0,.10))}
+  .badge2{position:absolute;top:14px;left:14px;background:var(--ink);color:var(--bg);font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:5px 10px;z-index:3}
+  .badge2.gold{background:var(--gold);color:#fff}
+  .cinfo{padding:18px 18px 0;text-align:center}
+  .ccat{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+  .cname{font-family:var(--serif);font-size:17px;font-weight:400;letter-spacing:.02em}
+  .cprice{margin-top:8px;font-size:14px;letter-spacing:.04em}
+  .cprice .old{color:#a9a49b;text-decoration:line-through;margin-right:8px;font-size:12.5px}
+
+  /* Reveal */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* Footer */
+  footer{border-top:1px solid var(--hair);background:var(--bg2)}
+  .fwrap{max-width:1280px;margin:0 auto;padding:64px 28px 30px;display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:40px}
+  .fcol h4{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink);margin-bottom:18px;font-weight:600}
+  .fcol a{display:block;font-size:13px;color:var(--ink2);margin-bottom:10px;transition:color .2s}
+  .fcol a:hover{color:var(--gold)}
+  .fcol p{font-size:13px;color:var(--ink2);max-width:280px}
+  .flogo{font-family:var(--serif);font-size:19px;letter-spacing:.26em;margin-bottom:14px}
+  .paybadges{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .pb{border:1px solid var(--hair);background:var(--white);padding:7px 14px;font-size:11px;letter-spacing:.08em;font-weight:600}
+  .pb.bkash{color:#d12053}.pb.nagad{color:#ec1d24}.pb.cod{color:var(--ink2)}
+  .fbottom{border-top:1px solid var(--hair);text-align:center;padding:18px;font-size:11px;letter-spacing:.12em;color:#a9a49b;text-transform:uppercase}
+
+  /* Cart drawer */
+  .overlay{position:fixed;inset:0;background:rgba(25,24,23,.4);opacity:0;pointer-events:none;transition:opacity .35s ease;z-index:80}
+  .overlay.show{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(400px,92vw);background:var(--bg);z-index:90;transform:translateX(105%);transition:transform .45s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(25,24,23,.15)}
+  .drawer.open{transform:none}
+  .dhead{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid var(--hair)}
+  .dhead h3{font-family:var(--serif);font-weight:400;font-size:19px;letter-spacing:.08em}
+  .dclose{font-size:22px;line-height:1;color:var(--ink2)}
+  .ditems{flex:1;overflow-y:auto;padding:8px 24px}
+  .dempty{text-align:center;color:var(--ink2);padding:60px 20px;font-size:13px;letter-spacing:.06em}
+  .dempty .em{font-size:34px;display:block;margin-bottom:14px;opacity:.5}
+  .ditem{display:flex;gap:14px;padding:18px 0;border-bottom:1px solid var(--hair);animation:slidein .35s ease}
+  @keyframes slidein{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+  .dthumb{width:58px;height:72px;flex:none;display:flex;align-items:center;justify-content:center}
+  .dthumb svg{width:70%;height:auto}
+  .dinfo{flex:1}
+  .dinfo .n{font-family:var(--serif);font-size:15px}
+  .dinfo .m{font-size:12px;color:var(--ink2);margin-top:3px}
+  .dinfo .p{font-size:13px;margin-top:5px;letter-spacing:.04em}
+  .dqty{display:inline-flex;align-items:center;border:1px solid var(--hair);margin-top:8px}
+  .dqty button{width:26px;height:26px;font-size:14px;color:var(--ink2)}
+  .dqty span{width:26px;text-align:center;font-size:12px}
+  .drem{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#a9a49b;align-self:flex-start;padding-top:2px;border-bottom:1px solid transparent;transition:.2s}
+  .drem:hover{color:#c0392b}
+  .dfoot{border-top:1px solid var(--hair);padding:20px 24px 26px;background:var(--bg2)}
+  .drow{display:flex;justify-content:space-between;font-size:13px;letter-spacing:.06em;margin-bottom:6px;color:var(--ink2)}
+  .drow.total{font-size:16px;color:var(--ink);font-family:var(--serif);margin:10px 0 16px}
+  .checkout{display:block;width:100%;background:var(--ink);color:var(--bg);text-align:center;padding:15px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;transition:background .25s}
+  .checkout:hover{background:var(--gold)}
+  .viewcart{display:block;width:100%;text-align:center;border:1px solid var(--ink);margin-top:10px;padding:13px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;transition:all .25s}
+  .viewcart:hover{background:var(--ink);color:var(--bg)}
+  .dnote{text-align:center;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#a9a49b;margin-top:12px}
+
+  /* Toast */
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:var(--bg);font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:12px 26px;z-index:100;transition:transform .4s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  @media(max-width:980px){
+    .pwrap{grid-template-columns:1fr;gap:36px}
+    .gallery{position:static}
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .fwrap{grid-template-columns:1fr 1fr;gap:34px}
+  }
+  @media(max-width:680px){
+    nav.mainnav{display:none}
+    .burger{display:flex}
+    .hwrap{padding:0 18px}
+    .crumbs,.pwrap,.tabsec,.relsec{padding-left:18px;padding-right:18px}
+    .tabbar{gap:20px;overflow-x:auto}
+    .tabbtn{white-space:nowrap}
+    .fwrap{grid-template-columns:1fr;padding:48px 18px 24px}
+  }
+</style>
+
+<div class="announce">Free delivery over <b>৳2000</b> &nbsp;·&nbsp; Cash on Delivery available nationwide</div>
+
+<header id="header">
+  <div class="hwrap">
+    <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+    <a class="logo" href="option-1-minimal-luxe.html">ATELIER<em>·</em>DHAKA</a>
+    <nav class="mainnav">
+      <a href="option-1-minimal-luxe.html">Home</a>
+      <a href="option-1-minimal-luxe.html#shop" class="active">Shop</a>
+      <a href="#footer">About</a>
+    </nav>
+    <div class="hicons">
+      <button class="icon-btn" aria-label="Search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      </button>
+      <button class="icon-btn" id="cartBtn" aria-label="Cart">
+        <svg viewBox="0 0 24 24"><path d="M6 7h12l1.2 12.2a1 1 0 0 1-1 1.1H5.8a1 1 0 0 1-1-1.1L6 7z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+  <div class="mobilenav" id="mobilenav">
+    <a href="option-1-minimal-luxe.html">Home</a><a href="option-1-minimal-luxe.html#shop">Shop</a><a href="#footer">About</a>
+  </div>
+</header>
+
+<div class="crumbs reveal">
+  <a href="option-1-minimal-luxe.html">Home</a><span class="sep">/</span><a href="option-1-minimal-luxe.html#shop">Shop</a><span class="sep">/</span><span class="cur" id="crumbName">Product</span>
+</div>
+
+<main class="pwrap">
+  <div class="gallery reveal">
+    <div class="mainimg" id="mainimg">
+      <div class="art" id="mainart"></div>
+      <span class="badge" id="pbadge" style="display:none"></span>
+    </div>
+    <div class="thumbs" id="thumbs"></div>
+  </div>
+
+  <div class="pinfo">
+    <div class="pcat reveal" id="pcat"></div>
+    <h1 class="pname reveal" id="pname"></h1>
+    <div class="pricerow reveal">
+      <span class="pprice" id="pprice"></span>
+      <span class="pold" id="pold" style="display:none"></span>
+      <span class="salebadge" id="psale" style="display:none">Sale</span>
+    </div>
+    <div class="stars reveal"><span class="s">★★★★★</span><span id="pratingtext">4.8 · 126 reviews</span></div>
+    <p class="pdesc reveal" id="pdesc"></p>
+
+    <div class="reveal">
+      <div class="optlabel">Size <span id="sizeSel">— select a size</span></div>
+      <div class="sizes" id="sizes"></div>
+    </div>
+
+    <div class="reveal">
+      <div class="optlabel">Colour <span id="colorSel"></span></div>
+      <div class="swatches" id="swatches"></div>
+    </div>
+
+    <div class="buyrow reveal">
+      <div class="qty">
+        <button id="qminus" aria-label="Decrease">−</button>
+        <span class="qv" id="qval">1</span>
+        <button id="qplus" aria-label="Increase">+</button>
+      </div>
+      <button class="addcart" id="addBtn">Add to Cart</button>
+    </div>
+    <a class="ordernow reveal" href="checkout.html">Order Now — Pay on Delivery</a>
+
+    <div class="trust reveal">
+      <span>🚚 Free delivery over ৳2000</span>
+      <span>💵 Cash on Delivery</span>
+      <span>📱 bKash accepted</span>
+    </div>
+  </div>
+</main>
+
+<section class="tabsec reveal">
+  <div class="tabbar" id="tabbar">
+    <button class="tabbtn active" data-tab="desc">Description</button>
+    <button class="tabbtn" data-tab="size">Size Guide</button>
+    <button class="tabbtn" data-tab="delivery">Delivery &amp; Returns</button>
+    <div class="tabline" id="tabline"></div>
+  </div>
+  <div class="tabpane show" id="pane-desc">
+    <h3>Crafted to last</h3>
+    <p id="longdesc"></p>
+    <ul>
+      <li>220 GSM premium combed cotton — soft, breathable, pre-shrunk</li>
+      <li>Reinforced shoulder-to-shoulder taping and double-needle hems</li>
+      <li>Cut, stitched and finished in small batches in Dhaka</li>
+      <li>Colour-fast dyes; wash cold, hang dry for best results</li>
+    </ul>
+  </div>
+  <div class="tabpane" id="pane-size">
+    <h3>Size guide (in inches)</h3>
+    <table class="sizetable">
+      <tr><th>Size</th><th>Chest</th><th>Length</th><th>Sleeve</th><th>Shoulder</th></tr>
+      <tr><td>S</td><td>36</td><td>26</td><td>7.5</td><td>16.5</td></tr>
+      <tr><td>M</td><td>38</td><td>27</td><td>8</td><td>17.5</td></tr>
+      <tr><td>L</td><td>40</td><td>28</td><td>8.5</td><td>18.5</td></tr>
+      <tr><td>XL</td><td>42</td><td>29</td><td>9</td><td>19.5</td></tr>
+      <tr><td>XXL</td><td>44</td><td>30</td><td>9.5</td><td>20.5</td></tr>
+    </table>
+    <p style="margin-top:12px">Between sizes? We recommend sizing up for a relaxed fit.</p>
+  </div>
+  <div class="tabpane" id="pane-delivery">
+    <h3>Delivery &amp; returns</h3>
+    <ul>
+      <li>Inside Dhaka: 1–2 working days · ৳80 (free over ৳2000)</li>
+      <li>Outside Dhaka: 2–4 working days via courier</li>
+      <li>Cash on Delivery, bKash and Nagad accepted nationwide</li>
+      <li>7-day easy exchange — unworn, with tags attached</li>
+    </ul>
+  </div>
+</section>
+
+<section class="relsec">
+  <div class="relhead reveal">
+    <div class="kicker">Complete the look</div>
+    <h2>You may also like</h2>
+  </div>
+  <div class="grid" id="relgrid"></div>
+</section>
+
+<footer id="footer">
+  <div class="fwrap">
+    <div class="fcol">
+      <div class="flogo">ATELIER·DHAKA</div>
+      <p>A premium menswear studio from Dhaka. Small batches, honest fabric, timeless cuts — delivered anywhere in Bangladesh.</p>
+    </div>
+    <div class="fcol">
+      <h4>Shop</h4>
+      <a href="option-1-minimal-luxe.html#shop">T-Shirts</a><a href="option-1-minimal-luxe.html#shop">Polos</a><a href="option-1-minimal-luxe.html#shop">Hoodies</a><a href="option-1-minimal-luxe.html#shop">Drop Shoulder</a>
+    </div>
+    <div class="fcol">
+      <h4>Help</h4>
+      <a href="#">Size Guide</a><a href="#">Delivery &amp; Returns</a><a href="#">Track Order</a><a href="#">Contact</a>
+    </div>
+    <div class="fcol">
+      <h4>We Accept</h4>
+      <div class="paybadges">
+        <span class="pb bkash">bKash</span>
+        <span class="pb nagad">Nagad</span>
+        <span class="pb cod">Cash on Delivery</span>
+      </div>
+    </div>
+  </div>
+  <div class="fbottom">© 2026 Atelier Dhaka · Crafted in Bangladesh</div>
+</footer>
+
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer" aria-label="Shopping cart">
+  <div class="dhead"><h3>Your Cart</h3><button class="dclose" id="drawerClose" aria-label="Close">×</button></div>
+  <div class="ditems" id="ditems"></div>
+  <div class="dfoot">
+    <div class="drow"><span>Delivery</span><span id="delivery">—</span></div>
+    <div class="drow total"><span>Total</span><span id="total">৳0</span></div>
+    <a class="checkout" href="checkout.html">Checkout</a>
+    <a class="viewcart" href="cart.html">View Cart</a>
+    <div class="dnote">bKash · Nagad · Cash on Delivery</div>
+  </div>
+</aside>
+
+<div class="toast" id="toast">Added to cart</div>
+
+<script>
+(function(){
+  var PRODUCTS=[
+    {id:1,name:"Essential Crew Tee",cat:"tshirt",catLabel:"T-Shirt",price:590,old:null,badge:null,c1:"#e9e5dc",c2:"#d6d0c2",tee:"#191817"},
+    {id:2,name:"Charcoal Heavy Tee",cat:"tshirt",catLabel:"T-Shirt",price:690,old:850,badge:"Sale",c1:"#e2e0dd",c2:"#c9c6c0",tee:"#3a3835"},
+    {id:3,name:"Ivory Pima Polo",cat:"polo",catLabel:"Polo",price:990,old:null,badge:"New",c1:"#f0ece2",c2:"#ddd5c2",tee:"#f5f1e6"},
+    {id:4,name:"Midnight Knit Polo",cat:"polo",catLabel:"Polo",price:1090,old:1290,badge:"Sale",c1:"#e4e6e8",c2:"#cbd0d4",tee:"#22262e"},
+    {id:5,name:"Cloud Fleece Hoodie",cat:"hoodie",catLabel:"Hoodie",price:1590,old:null,badge:null,c1:"#ece8e0",c2:"#d8d2c4",tee:"#8f8a80"},
+    {id:6,name:"Onyx Zip Hoodie",cat:"hoodie",catLabel:"Hoodie",price:1790,old:2100,badge:"Sale",c1:"#e3e1de",c2:"#c8c5c0",tee:"#1d1c1a"},
+    {id:7,name:"Oat Drop Shoulder",cat:"drop",catLabel:"Drop Shoulder",price:790,old:null,badge:"New",c1:"#efe9dd",c2:"#dccfb6",tee:"#cbb894"},
+    {id:8,name:"Slate Drop Shoulder",cat:"drop",catLabel:"Drop Shoulder",price:790,old:950,badge:"Sale",c1:"#e5e7e6",c2:"#ccd1cf",tee:"#5b6663"},
+    {id:9,name:"Bone Pocket Tee",cat:"tshirt",catLabel:"T-Shirt",price:640,old:null,badge:null,c1:"#f1ede4",c2:"#ded6c6",tee:"#efe9db"},
+    {id:10,name:"Forest Pique Polo",cat:"polo",catLabel:"Polo",price:1050,old:null,badge:null,c1:"#e7eae4",c2:"#cfd6ca",tee:"#2e4237"},
+    {id:11,name:"Ash Oversize Hoodie",cat:"hoodie",catLabel:"Hoodie",price:1690,old:null,badge:"New",c1:"#e9e8e6",c2:"#d3d1cd",tee:"#a7a49e"},
+    {id:12,name:"Espresso Drop Tee",cat:"drop",catLabel:"Drop Shoulder",price:840,old:990,badge:"Sale",c1:"#ece5dc",c2:"#d9cbba",tee:"#4a382c"}
+  ];
+
+  function teeSvg(color,cls){
+    return '<svg class="'+(cls||'tee')+'" viewBox="0 0 100 100"><path fill="'+color+'" stroke="rgba(0,0,0,.12)" stroke-width="1" d="M35 12 L20 20 L8 38 L20 46 L24 38 L24 88 L76 88 L76 38 L80 46 L92 38 L80 20 L65 12 C62 19 56 22 50 22 C44 22 38 19 35 12 Z"/></svg>';
+  }
+  function tk(n){return '৳'+n.toLocaleString('en-IN');}
+
+  /* Product from URL */
+  var pid=parseInt(new URLSearchParams(location.search).get('id'),10);
+  var P=PRODUCTS.find(function(x){return x.id===pid;})||PRODUCTS[0];
+
+  document.title=P.name+' — ATELIER DHAKA';
+  document.getElementById('crumbName').textContent=P.name;
+  document.getElementById('pcat').textContent=P.catLabel;
+  document.getElementById('pname').textContent=P.name;
+  document.getElementById('pprice').textContent=tk(P.price);
+  if(P.old){
+    var o=document.getElementById('pold');o.style.display='inline';o.textContent=tk(P.old);
+  }
+  if(P.badge==='Sale')document.getElementById('psale').style.display='inline-block';
+  if(P.badge){
+    var bd=document.getElementById('pbadge');
+    bd.style.display='block';bd.textContent=P.badge;
+    if(P.badge==='New')bd.classList.add('gold');
+  }
+  document.getElementById('pdesc').textContent='The '+P.name+' is an elevated everyday essential — 220 GSM breathable premium cotton with a clean, structured drape. Designed in Dhaka for the heat, cut for a timeless silhouette.';
+  document.getElementById('longdesc').textContent='Every '+P.name+' begins with long-staple combed cotton, knitted to a substantial 220 GSM and garment-washed for softness from the first wear. The result is a '+P.catLabel.toLowerCase()+' that holds its shape, resists pilling, and gets better with time.';
+
+  /* Gallery — colour variants of the placeholder art */
+  var variants=[
+    {c1:P.c1,c2:P.c2,tee:P.tee},
+    {c1:P.c2,c2:P.c1,tee:P.tee},
+    {c1:P.c1,c2:P.c2,tee:'#191817'},
+    {c1:'#f0ece2',c2:P.c2,tee:P.tee}
+  ];
+  var mainart=document.getElementById('mainart');
+  function setMain(v){
+    mainart.classList.add('fading');
+    setTimeout(function(){
+      mainart.style.background='linear-gradient(145deg,'+v.c1+' 0%,'+v.c2+' 100%)';
+      mainart.innerHTML=teeSvg(v.tee);
+      mainart.classList.remove('fading');
+    },200);
+  }
+  mainart.style.background='linear-gradient(145deg,'+variants[0].c1+' 0%,'+variants[0].c2+' 100%)';
+  mainart.innerHTML=teeSvg(variants[0].tee);
+  var thumbs=document.getElementById('thumbs');
+  thumbs.innerHTML=variants.map(function(v,i){
+    return '<button class="tbtn'+(i===0?' active':'')+'" data-i="'+i+'" aria-label="View '+(i+1)+'"><div class="art" style="background:linear-gradient(145deg,'+v.c1+' 0%,'+v.c2+' 100%)">'+teeSvg(v.tee,'')+'</div></button>';
+  }).join('');
+  thumbs.addEventListener('click',function(e){
+    var b=e.target.closest('.tbtn');if(!b)return;
+    thumbs.querySelectorAll('.tbtn').forEach(function(t){t.classList.remove('active');});
+    b.classList.add('active');
+    setMain(variants[+b.dataset.i]);
+  });
+
+  /* Size selector */
+  var SIZES=['S','M','L','XL','XXL'],selSize='M';
+  var sizesEl=document.getElementById('sizes');
+  sizesEl.innerHTML=SIZES.map(function(s){
+    return '<button class="sizebtn'+(s===selSize?' active':'')+'" data-s="'+s+'">'+s+'</button>';
+  }).join('');
+  document.getElementById('sizeSel').textContent='— '+selSize;
+  sizesEl.addEventListener('click',function(e){
+    var b=e.target.closest('.sizebtn');if(!b)return;
+    sizesEl.querySelectorAll('.sizebtn').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');selSize=b.dataset.s;
+    document.getElementById('sizeSel').textContent='— '+selSize;
+  });
+
+  /* Colour swatches */
+  var COLORS=[
+    {n:'Signature',c:P.tee},
+    {n:'Charcoal',c:'#3a3835'},
+    {n:'Bone',c:'#efe9db'},
+    {n:'Oat',c:'#cbb894'}
+  ],selColor=COLORS[0].n;
+  var swEl=document.getElementById('swatches');
+  swEl.innerHTML=COLORS.map(function(c,i){
+    return '<button class="swatch'+(i===0?' active':'')+'" data-n="'+c.n+'" style="background:'+c.c+'" aria-label="'+c.n+'"></button>';
+  }).join('');
+  document.getElementById('colorSel').textContent='— '+selColor;
+  swEl.addEventListener('click',function(e){
+    var b=e.target.closest('.swatch');if(!b)return;
+    swEl.querySelectorAll('.swatch').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');selColor=b.dataset.n;
+    document.getElementById('colorSel').textContent='— '+selColor;
+  });
+
+  /* Quantity stepper */
+  var qty=1,qval=document.getElementById('qval');
+  document.getElementById('qminus').addEventListener('click',function(){if(qty>1){qty--;qval.textContent=qty;}});
+  document.getElementById('qplus').addEventListener('click',function(){if(qty<10){qty++;qval.textContent=qty;}});
+
+  /* Shared cart (localStorage: luxe_cart = [{id,name,price,qty,size}]) */
+  var CART_KEY='luxe_cart';
+  function loadCart(){
+    try{var c=JSON.parse(localStorage.getItem(CART_KEY));return Array.isArray(c)?c:[];}catch(e){return [];}
+  }
+  function saveCart(c){localStorage.setItem(CART_KEY,JSON.stringify(c));}
+  var cart=loadCart();
+
+  var drawer=document.getElementById('drawer'),overlay=document.getElementById('overlay');
+  function openDrawer(){drawer.classList.add('open');overlay.classList.add('show');}
+  function closeDrawer(){drawer.classList.remove('open');overlay.classList.remove('show');}
+  document.getElementById('cartBtn').addEventListener('click',openDrawer);
+  document.getElementById('drawerClose').addEventListener('click',closeDrawer);
+  overlay.addEventListener('click',closeDrawer);
+
+  function cartTotals(){
+    var count=0,total=0;
+    cart.forEach(function(it){count+=it.qty;total+=it.price*it.qty;});
+    return {count:count,total:total};
+  }
+  function renderCart(){
+    var box=document.getElementById('ditems');
+    if(!cart.length){
+      box.innerHTML='<div class="dempty"><span class="em">🧺</span>Your cart is empty.<br>Beautiful basics await.</div>';
+    }else{
+      box.innerHTML=cart.map(function(it,idx){
+        var p=PRODUCTS.find(function(x){return x.id===it.id;})||{c1:'#eee',c2:'#ddd',tee:'#999',catLabel:''};
+        return '<div class="ditem"><div class="dthumb" style="background:linear-gradient(145deg,'+p.c1+','+p.c2+')">'+teeSvg(p.tee,'')+'</div>'+
+          '<div class="dinfo"><div class="n">'+it.name+'</div><div class="m">Size '+(it.size||'—')+' · '+p.catLabel+'</div>'+
+          '<div class="p">'+tk(it.price*it.qty)+'</div>'+
+          '<div class="dqty"><button data-idx="'+idx+'" data-d="-1">−</button><span>'+it.qty+'</span><button data-idx="'+idx+'" data-d="1">+</button></div></div>'+
+          '<button class="drem" data-idx="'+idx+'">Remove</button></div>';
+      }).join('');
+    }
+    var t=cartTotals();
+    document.getElementById('cartCount').textContent=t.count;
+    document.getElementById('total').textContent=tk(t.total);
+    document.getElementById('delivery').textContent=t.total===0?'—':(t.total>=2000?'Free':'৳80');
+    saveCart(cart);
+  }
+  document.getElementById('ditems').addEventListener('click',function(e){
+    var r=e.target.closest('.drem');
+    if(r){cart.splice(+r.dataset.idx,1);renderCart();return;}
+    var q=e.target.closest('.dqty button');
+    if(q){
+      var it=cart[+q.dataset.idx];
+      it.qty+=+q.dataset.d;
+      if(it.qty<1)cart.splice(+q.dataset.idx,1);
+      renderCart();
+    }
+  });
+
+  var toastTimer;
+  function toast(msg){
+    var t=document.getElementById('toast');
+    t.textContent=msg;t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(function(){t.classList.remove('show');},1600);
+  }
+  document.getElementById('addBtn').addEventListener('click',function(){
+    var ex=cart.find(function(it){return it.id===P.id&&it.size===selSize;});
+    if(ex)ex.qty+=qty; else cart.push({id:P.id,name:P.name,price:P.price,qty:qty,size:selSize});
+    renderCart();
+    var cb=document.getElementById('cartBtn');
+    cb.classList.remove('bump');void cb.offsetWidth;cb.classList.add('bump');
+    toast('Added to cart — '+P.name+' ('+selSize+')');
+  });
+
+  /* Related products */
+  var rel=PRODUCTS.filter(function(x){return x.id!==P.id&&x.cat===P.cat;});
+  PRODUCTS.forEach(function(x){if(rel.length<4&&x.id!==P.id&&rel.indexOf(x)===-1)rel.push(x);});
+  rel=rel.slice(0,4);
+  document.getElementById('relgrid').innerHTML=rel.map(function(p){
+    return '<a class="card reveal" href="product.html?id='+p.id+'">'+
+      '<div class="thumb"><div class="art" style="background:linear-gradient(145deg,'+p.c1+' 0%,'+p.c2+' 100%)">'+teeSvg(p.tee)+'</div>'+
+      (p.badge?'<span class="badge2'+(p.badge==='New'?' gold':'')+'">'+p.badge+'</span>':'')+'</div>'+
+      '<div class="cinfo"><div class="ccat">'+p.catLabel+'</div>'+
+      '<div class="cname">'+p.name+'</div>'+
+      '<div class="cprice">'+(p.old?'<span class="old">'+tk(p.old)+'</span>':'')+tk(p.price)+'</div></div></a>';
+  }).join('');
+
+  /* Tabs with animated underline */
+  var tabbar=document.getElementById('tabbar'),tabline=document.getElementById('tabline');
+  function moveLine(btn){
+    tabline.style.left=btn.offsetLeft+'px';
+    tabline.style.width=btn.offsetWidth+'px';
+  }
+  tabbar.addEventListener('click',function(e){
+    var b=e.target.closest('.tabbtn');if(!b)return;
+    tabbar.querySelectorAll('.tabbtn').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');moveLine(b);
+    document.querySelectorAll('.tabpane').forEach(function(p){p.classList.remove('show');});
+    document.getElementById('pane-'+b.dataset.tab).classList.add('show');
+  });
+  window.addEventListener('resize',function(){moveLine(tabbar.querySelector('.tabbtn.active'));});
+  setTimeout(function(){moveLine(tabbar.querySelector('.tabbtn.active'));},50);
+
+  /* Scroll reveal with stagger */
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e,i){
+      if(e.isIntersecting){
+        e.target.style.transitionDelay=(Math.min(i,6)*70)+'ms';
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:.08});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+
+  /* Header shadow + mobile nav */
+  var header=document.getElementById('header');
+  window.addEventListener('scroll',function(){
+    header.classList.toggle('scrolled',window.scrollY>8);
+  },{passive:true});
+  var burger=document.getElementById('burger'),mnav=document.getElementById('mobilenav');
+  burger.addEventListener('click',function(){
+    burger.classList.toggle('open');mnav.classList.toggle('open');
+  });
+  mnav.addEventListener('click',function(){burger.classList.remove('open');mnav.classList.remove('open');});
+
+  renderCart();
+})();
+</script>

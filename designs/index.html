@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T-Shirt Store — Design Options</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background:#0f1117; color:#e8e8ee; min-height:100vh; padding:48px 24px; }
+  .wrap { max-width:1000px; margin:0 auto; }
+  h1 { font-size:2.2rem; margin-bottom:8px; }
+  p.sub { color:#9aa0b0; margin-bottom:36px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+  a.card { display:block; background:#1a1d27; border:1px solid #2a2e3d; border-radius:14px; padding:24px; text-decoration:none; color:inherit; transition:transform .2s, border-color .2s; }
+  a.card:hover { transform:translateY(-4px); border-color:#6366f1; }
+  .num { font-size:.8rem; color:#6366f1; font-weight:700; letter-spacing:1px; }
+  .card h2 { font-size:1.15rem; margin:6px 0 8px; }
+  .card p { color:#9aa0b0; font-size:.9rem; line-height:1.5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>👕 Design Options</h1>
+  <p class="sub">Home page = product listing. Pick your favourite — we build the full site from it.</p>
+  <div class="grid">
+    <a class="card" href="option-1-minimal-luxe.html"><div class="num">OPTION 1</div><h2>Minimal Luxe</h2><p>White space, elegant serif headings, hairline borders, premium fashion-brand feel.</p></a>
+    <a class="card" href="option-2-dark-street.html"><div class="num">OPTION 2</div><h2>Dark Streetwear</h2><p>Near-black, neon accents, marquee ticker, drop-culture Gen-Z energy.</p></a>
+    <a class="card" href="option-3-soft-pastel.html"><div class="num">OPTION 3</div><h2>Soft &amp; Playful</h2><p>Pastel pops, big rounded corners, floating blobs, friendly everyday-wear brand.</p></a>
+    <a class="card" href="option-4-bold-editorial.html"><div class="num">OPTION 4</div><h2>Bold Editorial</h2><p>Massive magazine typography, asymmetric grid, trending scroll row, high-fashion energy.</p></a>
+    <a class="card" href="option-5-glass-gradient.html"><div class="num">OPTION 5</div><h2>Glass &amp; Gradient</h2><p>Frosted-glass cards over animated vibrant gradients, glowing buttons, premium tech feel.</p></a>
+  </div>
+</div>
+</body>
+</html>

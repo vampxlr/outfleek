@@ -1,0 +1,23 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+next-env.d.ts
+*.tsbuildinfo
+
+# secrets & local env  (NEVER commit these)
+.env
+.env*.local
+.env*
+
+# vercel
+.vercel
+
+# test/coverage output
+coverage/
+test-results/
+
+# graphify internals (graph.html / GRAPH_REPORT.md / graph.json ARE committed)
+graphify-out/.graphify_*
+graphify-out/cost.json

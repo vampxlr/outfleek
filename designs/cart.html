@@ -1,0 +1,405 @@
+<title>Your Cart — ATELIER DHAKA</title>
+<style>
+  :root{
+    --bg:#faf9f6; --bg2:#f3f1ec; --ink:#191817; --ink2:#5c5a55;
+    --hair:#e4e1da; --gold:#b08d3e; --white:#ffffff;
+    --serif:Georgia,'Times New Roman',serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
+  a{color:inherit;text-decoration:none}
+  input{font-family:inherit}
+
+  /* Announcement */
+  .announce{background:var(--ink);color:#d8d4cc;text-align:center;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:9px 16px}
+  .announce b{color:var(--gold);font-weight:600}
+
+  /* Header */
+  header{position:sticky;top:0;z-index:60;background:rgba(250,249,246,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--hair);transition:box-shadow .35s ease}
+  header.scrolled{box-shadow:0 6px 24px rgba(25,24,23,.08)}
+  .hwrap{max-width:1280px;margin:0 auto;padding:0 28px;height:66px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .logo{font-family:var(--serif);font-size:21px;letter-spacing:.26em;font-weight:400}
+  .logo em{font-style:normal;color:var(--gold)}
+  nav.mainnav{display:flex;gap:34px}
+  nav.mainnav a{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);position:relative;padding:6px 0;transition:color .25s}
+  nav.mainnav a:hover,nav.mainnav a.active{color:var(--ink)}
+  nav.mainnav a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--gold);transition:width .3s ease}
+  nav.mainnav a:hover::after,nav.mainnav a.active::after{width:100%}
+  .hicons{display:flex;align-items:center;gap:18px}
+  .icon-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;position:relative;color:var(--ink);transition:opacity .2s}
+  .icon-btn:hover{opacity:.6}
+  .icon-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .cart-count{position:absolute;top:1px;right:0;min-width:16px;height:16px;border-radius:8px;background:var(--gold);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;padding:0 4px;transition:transform .2s}
+  .icon-btn.bump{animation:bump .5s ease}
+  @keyframes bump{0%{transform:scale(1)}30%{transform:scale(1.28) rotate(-6deg)}60%{transform:scale(.94)}100%{transform:scale(1)}}
+  .burger{display:none;flex-direction:column;gap:5px;width:36px;height:36px;align-items:center;justify-content:center}
+  .burger span{display:block;width:20px;height:1.5px;background:var(--ink);transition:.3s}
+  .burger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+  .burger.open span:nth-child(2){opacity:0}
+  .burger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+  .mobilenav{display:none;border-top:1px solid var(--hair);background:var(--bg)}
+  .mobilenav.open{display:block}
+  .mobilenav a{display:block;padding:15px 28px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;border-bottom:1px solid var(--hair);color:var(--ink2)}
+
+  /* Page head */
+  .pagehead{max-width:1280px;margin:0 auto;padding:56px 28px 30px;text-align:center;border-bottom:1px solid var(--hair)}
+  .pagehead .kicker{font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+  .pagehead h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.1}
+  .pagehead .count{margin-top:12px;color:var(--ink2);font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+  .pagehead .rule{width:56px;height:1px;background:var(--gold);margin:24px auto 0}
+
+  /* Layout */
+  .cartwrap{max-width:1280px;margin:0 auto;padding:44px 28px 90px;display:grid;grid-template-columns:1fr 380px;gap:44px;align-items:start}
+
+  /* Free delivery bar */
+  .shipbar{grid-column:1/-1;border:1px solid var(--hair);background:var(--white);padding:18px 22px;margin-bottom:2px}
+  .shipbar .msg{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);margin-bottom:10px}
+  .shipbar .msg b{color:var(--gold);font-weight:600}
+  .shipbar .track{height:3px;background:var(--hair);position:relative;overflow:hidden}
+  .shipbar .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--gold);transition:width .9s cubic-bezier(.2,.8,.2,1)}
+  .shipbar.free .msg{color:var(--ink)}
+
+  /* Line items */
+  .items{border-top:1px solid var(--hair)}
+  .row{display:grid;grid-template-columns:96px 1fr auto;gap:20px;padding:24px 0;border-bottom:1px solid var(--hair);align-items:center;opacity:0;transform:translateY(20px);animation:rowin .6s ease forwards;transition:opacity .4s ease,transform .4s ease,max-height .4s ease,padding .4s ease}
+  @keyframes rowin{to{opacity:1;transform:none}}
+  .row.removing{opacity:0;transform:translateX(40px)}
+  .rthumb{width:96px;height:120px;display:flex;align-items:center;justify-content:center;border:1px solid var(--hair)}
+  .rthumb svg{width:56%;height:auto;filter:drop-shadow(0 6px 12px rgba(0,0,0,.10))}
+  .rinfo .n{font-family:var(--serif);font-size:18px;letter-spacing:.02em}
+  .rinfo .n a:hover{color:var(--gold)}
+  .rinfo .m{font-size:12px;color:var(--ink2);margin-top:5px;letter-spacing:.08em;text-transform:uppercase}
+  .rinfo .u{font-size:13px;color:var(--ink2);margin-top:6px;letter-spacing:.04em}
+  .qty{display:flex;align-items:center;border:1px solid var(--hair);margin-top:14px;width:max-content;background:var(--white)}
+  .qty button{width:34px;height:34px;font-size:15px;color:var(--ink2);transition:.2s}
+  .qty button:hover{background:var(--bg2);color:var(--ink)}
+  .qty .q{width:36px;text-align:center;font-size:13px;letter-spacing:.04em}
+  .rright{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:14px}
+  .ltotal{font-family:var(--serif);font-size:17px;letter-spacing:.02em;transition:transform .25s ease,color .25s ease}
+  .ltotal.tick{transform:scale(1.15);color:var(--gold)}
+  .rem{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#a9a49b;border-bottom:1px solid transparent;transition:.2s}
+  .rem:hover{color:#c0392b}
+
+  /* Empty state */
+  .empty{grid-column:1/-1;text-align:center;padding:70px 20px 40px}
+  .empty .em{font-size:52px;display:block;margin-bottom:20px;opacity:.45}
+  .empty h2{font-family:var(--serif);font-weight:400;font-size:28px;margin-bottom:10px}
+  .empty p{color:var(--ink2);font-size:14px;margin-bottom:28px;letter-spacing:.04em}
+  .btn-dark{display:inline-block;background:var(--ink);color:var(--bg);padding:15px 40px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;transition:background .25s}
+  .btn-dark:hover{background:var(--gold)}
+
+  /* Summary */
+  .summary{position:sticky;top:92px;border:1px solid var(--hair);background:var(--white);padding:28px}
+  .summary h3{font-family:var(--serif);font-weight:400;font-size:20px;letter-spacing:.06em;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--hair)}
+  .srow{display:flex;justify-content:space-between;font-size:13px;letter-spacing:.06em;color:var(--ink2);margin-bottom:10px}
+  .srow span:last-child{color:var(--ink);transition:transform .25s ease,color .25s ease}
+  .srow span.tick{transform:scale(1.1);color:var(--gold)}
+  .srow.disc{color:var(--gold)}
+  .srow.disc span:last-child{color:var(--gold)}
+  .srow.total{font-family:var(--serif);font-size:18px;color:var(--ink);border-top:1px solid var(--hair);padding-top:14px;margin-top:14px}
+  .zone{margin:14px 0 6px}
+  .zone .zl{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);margin-bottom:8px}
+  .zone .zopts{display:flex;gap:8px}
+  .zopt{flex:1;border:1px solid var(--hair);padding:8px 6px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);transition:all .25s;background:transparent}
+  .zopt:hover{border-color:var(--ink);color:var(--ink)}
+  .zopt.active{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+  .promo{display:flex;margin:18px 0 4px}
+  .promo input{flex:1;border:1px solid var(--hair);border-right:none;padding:12px 14px;font-size:12px;letter-spacing:.1em;background:transparent;outline:none;color:var(--ink);text-transform:uppercase}
+  .promo input:focus{border-color:var(--gold)}
+  .promo button{border:1px solid var(--ink);background:var(--ink);color:var(--bg);padding:0 18px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;transition:background .25s}
+  .promo button:hover{background:var(--gold);border-color:var(--gold)}
+  .pmsg{font-size:11.5px;letter-spacing:.08em;min-height:18px;margin-bottom:8px}
+  .pmsg.ok{color:var(--gold);animation:pop .45s ease}
+  .pmsg.bad{color:#c0392b;animation:shake .4s ease}
+  @keyframes pop{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+  @keyframes shake{0%,100%{transform:none}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+  .checkout{display:block;width:100%;background:var(--ink);color:var(--bg);text-align:center;padding:16px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;transition:background .25s;margin-top:12px}
+  .checkout:hover{background:var(--gold)}
+  .contshop{display:block;text-align:center;margin-top:14px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid transparent;transition:.2s}
+  .contshop:hover{color:var(--gold)}
+  .paybadges{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;justify-content:center}
+  .pb{border:1px solid var(--hair);background:var(--white);padding:7px 14px;font-size:11px;letter-spacing:.08em;font-weight:600}
+  .pb.bkash{color:#d12053}.pb.nagad{color:#ec1d24}.pb.cod{color:var(--ink2)}
+
+  /* Footer */
+  footer{border-top:1px solid var(--hair);background:var(--bg2)}
+  .fwrap{max-width:1280px;margin:0 auto;padding:64px 28px 30px;display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:40px}
+  .fcol h4{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink);margin-bottom:18px;font-weight:600}
+  .fcol a{display:block;font-size:13px;color:var(--ink2);margin-bottom:10px;transition:color .2s}
+  .fcol a:hover{color:var(--gold)}
+  .fcol p{font-size:13px;color:var(--ink2);max-width:280px}
+  .flogo{font-family:var(--serif);font-size:19px;letter-spacing:.26em;margin-bottom:14px}
+  .fbottom{border-top:1px solid var(--hair);text-align:center;padding:18px;font-size:11px;letter-spacing:.12em;color:#a9a49b;text-transform:uppercase}
+
+  @media(max-width:980px){
+    .cartwrap{grid-template-columns:1fr;gap:34px}
+    .summary{position:static}
+    .fwrap{grid-template-columns:1fr 1fr;gap:34px}
+  }
+  @media(max-width:680px){
+    nav.mainnav{display:none}
+    .burger{display:flex}
+    .hwrap{padding:0 18px}
+    .pagehead{padding:42px 18px 26px}
+    .cartwrap{padding:30px 18px 60px}
+    .row{grid-template-columns:72px 1fr;gap:14px}
+    .rthumb{width:72px;height:90px}
+    .rright{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center}
+    .fwrap{grid-template-columns:1fr;padding:48px 18px 24px}
+  }
+</style>
+
+<div class="announce">Free delivery over <b>৳2000</b> &nbsp;·&nbsp; Cash on Delivery available nationwide</div>
+
+<header id="header">
+  <div class="hwrap">
+    <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+    <a class="logo" href="option-1-minimal-luxe.html">ATELIER<em>·</em>DHAKA</a>
+    <nav class="mainnav">
+      <a href="option-1-minimal-luxe.html">Home</a>
+      <a href="option-1-minimal-luxe.html#shop">Shop</a>
+      <a href="cart.html" class="active">Cart</a>
+    </nav>
+    <div class="hicons">
+      <button class="icon-btn" aria-label="Search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      </button>
+      <a class="icon-btn" id="cartBtn" href="cart.html" aria-label="Cart">
+        <svg viewBox="0 0 24 24"><path d="M6 7h12l1.2 12.2a1 1 0 0 1-1 1.1H5.8a1 1 0 0 1-1-1.1L6 7z"/><path d="M9 7V6a3 3 0 0 1 6 0v1"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </a>
+    </div>
+  </div>
+  <div class="mobilenav" id="mobilenav">
+    <a href="option-1-minimal-luxe.html">Home</a><a href="option-1-minimal-luxe.html#shop">Shop</a><a href="cart.html">Cart</a>
+  </div>
+</header>
+
+<section class="pagehead">
+  <div class="kicker">Atelier · Dhaka</div>
+  <h1>Your Cart</h1>
+  <div class="count" id="headCount">0 items</div>
+  <div class="rule"></div>
+</section>
+
+<main class="cartwrap" id="cartwrap">
+  <div class="shipbar" id="shipbar" style="display:none">
+    <div class="msg" id="shipMsg"></div>
+    <div class="track"><div class="fill" id="shipFill"></div></div>
+  </div>
+  <section class="items" id="items"></section>
+  <aside class="summary" id="summary">
+    <h3>Order Summary</h3>
+    <div class="srow"><span>Subtotal</span><span id="subtotal">৳0</span></div>
+    <div class="srow disc" id="discRow" style="display:none"><span>Discount (SAVE10)</span><span id="discount">−৳0</span></div>
+    <div class="zone">
+      <div class="zl">Delivery Zone</div>
+      <div class="zopts">
+        <button class="zopt active" data-zone="dhaka">Inside Dhaka · ৳80</button>
+        <button class="zopt" data-zone="outside">Outside · ৳130</button>
+      </div>
+    </div>
+    <div class="srow"><span>Delivery</span><span id="delivery">৳80</span></div>
+    <div class="srow total"><span>Total</span><span id="total">৳0</span></div>
+    <div class="promo">
+      <input type="text" id="promoInput" placeholder="Promo code" aria-label="Promo code">
+      <button id="promoBtn">Apply</button>
+    </div>
+    <div class="pmsg" id="pmsg"></div>
+    <a class="checkout" href="checkout.html">Proceed to Checkout</a>
+    <a class="contshop" href="option-1-minimal-luxe.html">← Continue Shopping</a>
+    <div class="paybadges">
+      <span class="pb bkash">bKash</span>
+      <span class="pb nagad">Nagad</span>
+      <span class="pb cod">Cash on Delivery</span>
+    </div>
+  </aside>
+</main>
+
+<footer id="footer">
+  <div class="fwrap">
+    <div class="fcol">
+      <div class="flogo">ATELIER·DHAKA</div>
+      <p>A premium menswear studio from Dhaka. Small batches, honest fabric, timeless cuts — delivered anywhere in Bangladesh.</p>
+    </div>
+    <div class="fcol">
+      <h4>Shop</h4>
+      <a href="option-1-minimal-luxe.html#shop">T-Shirts</a><a href="option-1-minimal-luxe.html#shop">Polos</a><a href="option-1-minimal-luxe.html#shop">Hoodies</a><a href="option-1-minimal-luxe.html#shop">Drop Shoulder</a>
+    </div>
+    <div class="fcol">
+      <h4>Help</h4>
+      <a href="#">Size Guide</a><a href="#">Delivery &amp; Returns</a><a href="#">Track Order</a><a href="#">Contact</a>
+    </div>
+    <div class="fcol">
+      <h4>We Accept</h4>
+      <div class="paybadges" style="justify-content:flex-start;margin-top:6px">
+        <span class="pb bkash">bKash</span>
+        <span class="pb nagad">Nagad</span>
+        <span class="pb cod">Cash on Delivery</span>
+      </div>
+    </div>
+  </div>
+  <div class="fbottom">© 2026 Atelier Dhaka · Crafted in Bangladesh</div>
+</footer>
+
+<script>
+(function(){
+  var KEY='luxe_cart';
+  var FREE_AT=2000, FEE={dhaka:80,outside:130};
+  var zone='dhaka', promo=false;
+
+  var SHADES=['#191817','#3a3835','#8f8a80','#cbb894','#2e4237','#5b6663','#4a382c','#a7a49e'];
+  var BGS=[['#e9e5dc','#d6d0c2'],['#f0ece2','#ddd5c2'],['#e4e6e8','#cbd0d4'],['#efe9dd','#dccfb6'],['#e7eae4','#cfd6ca']];
+
+  function teeSvg(color){
+    return '<svg viewBox="0 0 100 100"><path fill="'+color+'" stroke="rgba(0,0,0,.12)" stroke-width="1" d="M35 12 L20 20 L8 38 L20 46 L24 38 L24 88 L76 88 L76 38 L80 46 L92 38 L80 20 L65 12 C62 19 56 22 50 22 C44 22 38 19 35 12 Z"/></svg>';
+  }
+  function tk(n){return '৳'+n.toLocaleString('en-IN');}
+  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+
+  function load(){
+    try{var c=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(c)?c:[];}catch(e){return [];}
+  }
+  function save(){localStorage.setItem(KEY,JSON.stringify(cart));}
+  var cart=load();
+
+  function subtotal(){return cart.reduce(function(s,i){return s+i.price*i.qty;},0);}
+  function count(){return cart.reduce(function(s,i){return s+i.qty;},0);}
+
+  function tickEl(el){
+    el.classList.remove('tick'); void el.offsetWidth; el.classList.add('tick');
+    setTimeout(function(){el.classList.remove('tick');},350);
+  }
+
+  function renderItems(){
+    var box=document.getElementById('items');
+    if(!cart.length){
+      box.innerHTML='';
+      document.getElementById('summary').style.display='none';
+      document.getElementById('shipbar').style.display='none';
+      var e=document.createElement('div');
+      e.className='empty'; e.id='empty';
+      e.innerHTML='<span class="em">🧺</span><h2>Your cart is empty</h2><p>Beautiful basics await — quiet luxury, made for Dhaka.</p><a class="btn-dark" href="option-1-minimal-luxe.html#shop">Shop the Collection</a>';
+      document.getElementById('cartwrap').appendChild(e);
+      return;
+    }
+    var old=document.getElementById('empty'); if(old)old.remove();
+    document.getElementById('summary').style.display='';
+    document.getElementById('shipbar').style.display='';
+    box.innerHTML=cart.map(function(it,i){
+      var tee=SHADES[(it.id||i)%SHADES.length], bg=BGS[(it.id||i)%BGS.length];
+      return '<div class="row" data-i="'+i+'" style="animation-delay:'+(i*90)+'ms">'+
+        '<div class="rthumb" style="background:linear-gradient(145deg,'+bg[0]+','+bg[1]+')">'+teeSvg(tee)+'</div>'+
+        '<div class="rinfo">'+
+          '<div class="n"><a href="product.html?id='+encodeURIComponent(it.id)+'">'+esc(it.name)+'</a></div>'+
+          '<div class="m">Size '+esc(it.size||'M')+'</div>'+
+          '<div class="u">'+tk(it.price)+' each</div>'+
+          '<div class="qty"><button class="dec" aria-label="Decrease">−</button><span class="q">'+it.qty+'</span><button class="inc" aria-label="Increase">+</button></div>'+
+        '</div>'+
+        '<div class="rright"><div class="ltotal">'+tk(it.price*it.qty)+'</div><button class="rem">Remove</button></div>'+
+      '</div>';
+    }).join('');
+  }
+
+  function renderSummary(animate){
+    var sub=subtotal(), c=count();
+    document.getElementById('headCount').textContent=c+(c===1?' item':' items');
+    document.getElementById('cartCount').textContent=c;
+    var disc=promo?Math.round(sub*0.10):0;
+    var afterDisc=sub-disc;
+    var fee=afterDisc>=FREE_AT?0:FEE[zone];
+    var subEl=document.getElementById('subtotal'), totEl=document.getElementById('total');
+    subEl.textContent=tk(sub);
+    document.getElementById('delivery').textContent=sub===0?'—':(fee===0?'Free':tk(fee));
+    var dr=document.getElementById('discRow');
+    dr.style.display=promo?'':'none';
+    document.getElementById('discount').textContent='−'+tk(disc);
+    totEl.textContent=tk(afterDisc+(sub===0?0:fee));
+    if(animate){tickEl(subEl);tickEl(totEl);}
+    // free delivery bar
+    var bar=document.getElementById('shipbar');
+    var pct=Math.min(100,Math.round(afterDisc/FREE_AT*100));
+    if(afterDisc>=FREE_AT){
+      bar.classList.add('free');
+      document.getElementById('shipMsg').innerHTML='<b>Congratulations</b> — your delivery is free.';
+    }else{
+      bar.classList.remove('free');
+      document.getElementById('shipMsg').innerHTML='Add <b>'+tk(FREE_AT-afterDisc)+'</b> more for free delivery';
+    }
+    requestAnimationFrame(function(){document.getElementById('shipFill').style.width=pct+'%';});
+  }
+
+  function refresh(animate){renderItems();renderSummary(animate);}
+
+  /* Item events */
+  document.getElementById('items').addEventListener('click',function(e){
+    var row=e.target.closest('.row'); if(!row)return;
+    var i=+row.dataset.i, it=cart[i]; if(!it)return;
+    if(e.target.closest('.inc')||e.target.closest('.dec')){
+      var d=e.target.closest('.inc')?1:-1;
+      it.qty=Math.max(1,it.qty+d);
+      save();
+      row.querySelector('.q').textContent=it.qty;
+      var lt=row.querySelector('.ltotal'); lt.textContent=tk(it.price*it.qty); tickEl(lt);
+      renderSummary(true);
+      var cb=document.getElementById('cartBtn');
+      cb.classList.remove('bump'); void cb.offsetWidth; cb.classList.add('bump');
+    }else if(e.target.closest('.rem')){
+      row.classList.add('removing');
+      setTimeout(function(){
+        cart.splice(i,1); save(); refresh(true);
+      },380);
+    }
+  });
+
+  /* Zone selector */
+  document.querySelectorAll('.zopt').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('.zopt').forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active'); zone=b.dataset.zone; renderSummary(true);
+    });
+  });
+
+  /* Promo */
+  function applyPromo(){
+    var v=document.getElementById('promoInput').value.trim().toUpperCase();
+    var msg=document.getElementById('pmsg');
+    msg.className='pmsg';
+    if(v==='SAVE10'){
+      promo=true;
+      void msg.offsetWidth;
+      msg.textContent='✓ Code applied — 10% off your order';
+      msg.classList.add('ok');
+      renderSummary(true);
+    }else{
+      promo=false;
+      void msg.offsetWidth;
+      msg.textContent=v?'This code is not valid':'Enter a promo code';
+      msg.classList.add('bad');
+      renderSummary(true);
+    }
+  }
+  document.getElementById('promoBtn').addEventListener('click',applyPromo);
+  document.getElementById('promoInput').addEventListener('keydown',function(e){if(e.key==='Enter')applyPromo();});
+
+  /* Header shadow + mobile nav */
+  var header=document.getElementById('header');
+  window.addEventListener('scroll',function(){
+    header.classList.toggle('scrolled',window.scrollY>8);
+  },{passive:true});
+  var burger=document.getElementById('burger'),mnav=document.getElementById('mobilenav');
+  burger.addEventListener('click',function(){
+    burger.classList.toggle('open'); mnav.classList.toggle('open');
+  });
+
+  /* Cross-tab sync */
+  window.addEventListener('storage',function(e){
+    if(e.key===KEY){cart=load();refresh(false);}
+  });
+
+  refresh(false);
+})();
+</script>
